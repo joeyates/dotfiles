@@ -1,0 +1,6 @@
+#!/bin/sh
+
+BYTES=${1:-32)}
+openssl rand -hex $BYTES
+
+# Installed by chef from 'personal-kitchen'

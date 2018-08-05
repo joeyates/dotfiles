@@ -1,0 +1,95 @@
+#!/usr/bin/env ruby
+
+require "optparse"
+
+KNOWN_KEY_SIZES = [2048, 4096]
+
+def example_config
+  puts <<~EOT
+  [req]
+  prompt = no
+  distinguished_name = dn
+
+  [dn]
+  CN = www.example.com
+  emailAddress = info@example.com
+  O = Foobar Ltd
+  L = Hayes
+  ST = Middlesex
+  C = UK
+  EOT
+end
+
+options = {
+  key_size: KNOWN_KEY_SIZES[-1]
+}
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: #{__FILE__} [options]"
+
+  opts.on(
+    "-e",
+    "--example",
+    "Print an example config file"
+  ) do |example|
+    example_config
+    exit 0
+  end
+
+  opts.on(
+    "-d",
+    "--domain [DOMAIN]",
+    "The domain name - used as the base name of files"
+  ) do |remote|
+    options[:domain] = domain
+  end
+
+  opts.on(
+    "-c",
+    "--config [DOMAIN]",
+    "The configuration file"
+  ) do |remote|
+    options[:config] = config
+  end
+
+  opts.on(
+    "-s",
+    "--key-size [#{KNOWN_KEY_SIZES.join("|")}]",
+    "the key bit length (default '#{options[:key_size]}')"
+  ) do |key_size|
+    if KNOWN_KEY_SIZES.include?(key_size.to_i)
+      options[:key_size] = key_size
+    else
+      raise "Key size must be one of: #{KNOWN_KEY_SIZES.join(", ")}"
+    end
+  end
+
+  opts.on("-h", "--help", "Display this help") do
+    puts opts
+    exit
+  end
+end
+
+parser.parse!
+
+key_path = options[:domain] + "key"
+csr_path = options[:domain] + "csr"
+key_size = options[:key_size]
+
+if !File.exists?(key_path)
+  `openssl genrsa -out #{key_path} #{key_size}`
+end
+
+if !File.exists?(csr_path)
+  command = <<~EOF
+  openssl \\
+    req \\
+    -new \\
+    -utf8 \\
+    -config #{config_path} \\
+    -key #{key_path} \\
+    -out #{csr_path}
+  EOF
+end
+
+`openssl req -text -in #{csr_path}`

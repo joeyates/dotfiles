@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require "date"
+
+filename = ARGV[0] || "domains.txt"
+
+domains_pathname = File.expand_path(filename, Dir.pwd)
+
+if !File.exist?(domains_pathname)
+  raise "No domains file found at '#{domains_pathname}'"
+end
+
+domains = File.read(domains_pathname).split("\n")
+
+domains.each do |domain|
+  #print "#{domain}: "
+  #get_certificate =
+  #  "openssl s_client -connect #{domain}:443 -servername #{domain}"
+  #extract_dates = "openssl x509 -noout -dates"
+  command = "jgy-ssl-checker #{domain}"
+  #"echo | #{get_certificate} 2>/dev/null | #{extract_dates} 2>/dev/null"
+  puts `#{command}`
+end

@@ -1,0 +1,91 @@
+#!/usr/bin/env ruby
+
+CONFLICT = /^UU\s/m.freeze
+STAGED = /^M \s/m.freeze
+STAGED_DELETED = /^D /m.freeze
+UNKNOWN = /^\?\?/m.freeze
+UNSTAGED_MODIFIED = /^ M\s/m.freeze
+MAXIMUM_OUTPUT_LENGTH = 30
+
+exit 0 if !File.directory?(".git")
+
+def matches?(s, regexp)
+  if RUBY_VERSION > "2.4"
+    s.match?(regexp)
+  else
+    s.match(regexp)
+  end
+end
+
+def current_branch
+  `git rev-parse --abbrev-ref HEAD`.split[0]
+end
+
+def repo_status
+  `git status --short`
+end
+
+def has_deleted?(status)
+  matches?(status, STAGED_DELETED)
+end
+
+def has_unknown_files?(status)
+  matches?(status, UNKNOWN)
+end
+
+def has_conflicts?(status)
+  matches?(status, CONFLICT)
+end
+
+def has_modified?(status)
+  matches?(status, UNSTAGED_MODIFIED)
+end
+
+def has_staged?(status)
+  matches?(status, STAGED)
+end
+
+def shorten_branch(branch, length)
+  b = branch.gsub(%r{^feature/}, "f/")
+  if b.length > length
+    b[0 .. length - 3] + "..."
+  else
+    b
+  end
+end
+
+status = repo_status
+result = ""
+length = MAXIMUM_OUTPUT_LENGTH
+
+if has_deleted?(status)
+  result << "#[fg=yellow]-"
+  length -= 1
+end
+
+if has_unknown_files?(status)
+  result << "#[fg=cyan]+"
+  length -= 1
+end
+
+branch = shorten_branch(current_branch, length)
+
+case
+when has_conflicts?(status)
+  # Conflict
+  result << "#[fg=red]Conflict!"
+when has_modified?(status)
+  # Modified
+  result << "#[fg=green]#{branch}"
+when has_staged?(status)
+  # Modification Staged
+  result << "#[fg=yellow]#{branch}"
+when has_deleted?(status)
+  # Delete Staged
+  result << "#[fg=yellow]#{branch}"
+else
+  # Clean
+  result << "#[fg=white]#{branch}"
+end
+
+puts result

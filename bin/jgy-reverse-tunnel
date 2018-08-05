@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Usage
+# reverse-tunnel <remote host> <remote port> <local port>
+ssh -nNT -R $2:localhost:$3 $1
+
+# Installed by chef from 'personal-kitchen'

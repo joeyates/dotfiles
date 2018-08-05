@@ -1,0 +1,5 @@
+#!/bin/sh
+
+diff -qr $1 $2 | grep -v '/.git/' | sort
+
+# Installed by chef from 'personal-kitchen'

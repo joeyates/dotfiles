@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+require "date"
+require "openssl"
+
+raise "You must pass a domain name" if ARGV.count < 1
+
+domain = ARGV[0]
+verbose = ARGV[1]
+
+print "#{domain}: "
+get_certificate =
+  "openssl s_client -connect #{domain}:443 -servername #{domain}"
+command = "echo | #{get_certificate} 2>/dev/null"
+result = `#{command}`
+
+success = $?.success?
+if !success
+  puts "failed to get certificate"
+  exit -1
+end
+
+if verbose
+  puts "result: #{result}"
+end
+
+certificate = OpenSSL::X509::Certificate.new(result)
+
+not_after = certificate.not_after
+now = Time.now
+remaining = (not_after - now).to_f / (24 * 3600)
+puts "%0.02f days remaining" % remaining

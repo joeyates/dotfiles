@@ -1,0 +1,7 @@
+#!/bin/sh -e
+
+DATE=${1:-$(date --utc --iso-8601=seconds)}
+
+echo `date --date=$DATE --utc +%s`
+
+# Installed by chef from 'personal-kitchen'

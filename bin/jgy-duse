@@ -1,0 +1,15 @@
+#!/bin/sh
+
+DIRECTORY=${1:-.}
+du $DIRECTORY \
+  --block-size=M \
+  --max-depth=1 \
+  --one-file-system | \
+sort \
+  --reverse \
+  --numeric-sort
+
+# Short version:
+# $ du -BM -d1 -x | sort -rn
+
+# Installed by chef from 'personal-kitchen'

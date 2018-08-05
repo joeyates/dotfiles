@@ -1,0 +1,7 @@
+#!/bin/sh -e
+
+EPOCH_SECONDS=${1:-$(date --utc +%s)}
+
+echo `date --date="@$EPOCH_SECONDS" --utc --iso-8601=seconds`
+
+# Installed by chef from 'personal-kitchen'
