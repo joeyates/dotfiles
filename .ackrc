@@ -1,0 +1,24 @@
+# always colour
+--color
+# types
+--type-set=clojure=.clj
+--type-set=coffee=.coffee
+--type-set=json=.json
+--type-set=sass=.sass
+--type-set=scss=.scss
+--type-set=slim=.slim
+--type-add=objc:ext:m,h
+--ignore-file=is:.emacs.desktop
+# directories
+--ignore-dir=_build
+--ignore-dir=coverage
+--ignore-dir=deps
+--ignore-dir=dist
+--ignore-dir=elm-stuff
+--ignore-dir=env
+--ignore-dir=log
+--ignore-dir=rel
+--ignore-dir=temp
+--ignore-dir=tmp
+--ignore-dir=vendor
+

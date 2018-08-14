@@ -1,0 +1,25 @@
+[global_config]
+  enabled_plugins = CustomCommandsMenu,
+  tab_position = hidden
+  inactive_color_offset = 1.0
+  suppress_multiple_term_dialog = True
+[keybindings]
+[profiles]
+  [[default]]
+    scrollbar_position = hidden
+    use_system_font = False
+    background_image = None
+    foreground_color = "#839496"
+    show_titlebar = False
+    font = Monospace 11
+    background_color = "#002b36"
+[layouts]
+  [[default]]
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+      profile = default
+    [[[window0]]]
+      type = Window
+      parent = ""
+[plugins]

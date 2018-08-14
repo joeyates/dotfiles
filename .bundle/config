@@ -1,0 +1,6 @@
+---
+BUNDLE_BIN: "bin/stubs"
+BUNDLE_LOCAL__HIGHLINE-TEST: "/home/joe/code/highline-test"
+BUNDLE_GEM__TEST: "rspec"
+BUNDLE_GEM__MIT: "true"
+BUNDLE_GEM__COC: "true"

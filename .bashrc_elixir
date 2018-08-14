@@ -1,0 +1,18 @@
+# kerl
+
+export KERL_BUILD_BACKEND=git
+export OTP_GITHUB_URL="https://github.com/erlang/otp"
+export ERL_AFLAGS="-kernel shell_history enabled"
+export KERL_ERLANG_VERSION=20.0.1
+
+. /home/joe/.kerl/installs/$KERL_ERLANG_VERSION/activate
+
+# kiex
+
+export KIEX_ELIXIR_VERSION=elixir-1.6.4
+
+[[ -s "$HOME/.kiex/scripts/kiex" ]] && source "$HOME/.kiex/scripts/kiex"
+
+kiex default $KIEX_ELIXIR_VERSION > /dev/null 2>&1
+kiex use $KIEX_ELIXIR_VERSION > /dev/null
+# File managed by personal-kitchen

@@ -1,0 +1,45 @@
+function jgy-ack-command() {
+  if which ack-grep >/dev/null ; then
+    echo ack-grep
+  elif which ag >/dev/null ; then
+    echo ag
+  fi
+}
+
+if [ jgy-ack-command ]; then
+  alias a=`jgy-ack-command`
+  alias aw='jgy-grep-word'
+fi
+
+alias b=bundle
+alias c=jgy-clear-screen
+alias dw=jgy-word-diff
+alias e=jgy-edit
+alias en='jgy-edit-no-session'
+alias f=jgy-everyday-find
+alias g='git'
+alias gde='gist_directory edit'
+alias gdv='gist_directory view'
+alias gk='gitk --all'
+alias h='history'
+alias less='less -R'
+alias l='ls -lF'
+alias l1='ls -1A'
+alias la='ls -lA'
+alias lh='ls -lhA'
+alias ltr='ls -lAtr'
+alias ll='l'
+
+if which trash-put >/dev/null ; then
+  alias t='trash-put'
+fi
+
+alias rpc='pry -r ./config/environment'
+alias tmux-rails='tmux attach -t rails || tmux new-session -s rails \; source-file ~/.tmux/rails-session.conf \; attach'
+alias ta='tmux attach'
+alias tmr='tmux-rails'
+
+if [ -f ~/.bash_aliases ]; then
+  . ~/.bash_aliases
+fi
+# File managed by personal-kitchen

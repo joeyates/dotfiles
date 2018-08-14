@@ -1,0 +1,48 @@
+# knife-bootstrap <host> <operating system>
+function knife-bootstrap() {
+  bundle exec knife bootstrap --template-file bootstrap/$2.erb -u root $1
+}
+
+function knife-create-site-cookbook() {
+  bundle exec knife cookbook create $1 -o site-cookbooks  
+}
+
+function knife-create-data-bag() {
+  bundle exec knife solo data bag create $1 $2
+}
+
+function knife-create-data-bag-from-json() {
+  bundle exec knife solo data bag create $1 $2 --json-file $3
+}
+
+function knife-edit-data-bag() {
+  bundle exec knife solo data bag edit $1 $2
+}
+
+function knife-dump-data-bag-to-json() {
+  bundle exec knife solo data bag show $1 $2 -F json
+}
+
+function knife-edit-user() {
+  knife-edit-data-bag users $1
+}
+
+function knife-whyrun() {
+  bundle exec knife solo cook --no-chef-check --why-run root@$1
+}
+
+function knife-debug-whyrun() {
+  bundle exec knife solo cook -V --no-chef-check --why-run root@$1
+}
+
+function knife-deploy() {
+  bundle exec knife solo cook --no-chef-check root@$1
+}
+
+function knife-debug-deploy() {
+  bundle exec knife solo cook --no-chef-check root@$1
+}
+
+function knife-clean() {
+  bundle exec knife solo clean root@$1
+}

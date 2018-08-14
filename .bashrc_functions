@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+
+# f - everyday find
+# usage:
+#   f filename_fragment [path]
+# skips git directories and python compiled files
+_exclude_matches=( '_build' 'bundle' 'deps' 'dist' '.git' 'node_modules' '*.pyc' 'rel' );
+_excludes=''
+for _match in ${_exclude_matches[@]}; do
+  _excludes="$_excludes -name '$_match' -prune -o "
+done
+
+eval "
+function jgy-everyday-find() {
+  find \$2 \
+    $_excludes \
+    -iname \"*\$1*\"    \
+    -print;
+}
+"
+unset _exclude_matches _excludes _match
+
+function jgy-timestamp {
+  date +%Y%m%d%H%M%S
+}
+
+function deactivate_virtualenv() {
+  type deactivate >/dev/null 2>/dev/null && deactivate
+}
+
+function jgy-clear-screen() {
+  local lines=`tput lines`
+
+  for i in $(seq 1 $lines)
+  do
+    echo "";
+  done
+}
+
+function jgy-word-diff() {
+  wdiff $1 $2 | colordiff
+}
+
+function jgy-file-as-json-string() {
+  ruby -e "puts File.read('$1').inspect"
+}
+
+function jgy-ack-command() {
+  if which ack-grep >/dev/null ; then
+    echo ack-grep
+  elif which ag >/dev/null ; then
+    echo ag
+  fi
+}
+
+if [ jgy-ack-command ]; then
+  function jgy-grep-word() {
+    local pattern=$1
+    shift
+    `jgy-ack-command` "\b$pattern\b" $*
+  }
+fi
+
+function jgy-ssh-keygen() {
+  if [ "x$1x" == "xhelpx" ]; then
+    jgy-ssh-keygen-usage;
+    return 0;
+  fi
+  BYTES=${BYTES:-4096}
+  COMMENT=${COMMENT:-RSA key}
+  NAME=${NAME:-id_rsa}
+  ssh-keygen -t rsa -b $BYTES -N "" -C "$COMMENT" -f "$NAME"
+}
+
+function jgy-ssh-keygen-usage() {
+  echo "Usage: [BYTES=2048|4096*] [COMMENT=""] [NAME=FILE_NAME] jgy-ssh-keygen";
+}
+
+##########################################
+# SSL/TLS
+
+function jgy-online-certificate {
+  local hostname=$1
+  shift
+  echo | \
+  openssl s_client \
+  -connect $hostname:443 \
+  -servername $hostname \
+  2>/dev/null
+}
+
+function jgy-certificate-expiry {
+  local hostname=$1
+  shift
+  jgy-online-certificate $hostname | \
+  openssl x509 -inform pem -noout -enddate
+}
+
+##########################################
+# emacs
+
+function jgy-is-emacs-running {
+  pgrep -x emacs >/dev/null
+}
+
+function jgy-edit { 
+  if [ ! -f ".emacs.desktop" ]; then
+    # If there is no saved session,
+    # stop emacs searching in parent directories
+    touch .emacs.desktop
+  fi
+  if jgy-is-emacs-running
+  then
+    # running - use emacsclient
+    emacsclient --alternate-editor="" --no-wait $*
+  else
+    # not running - use emacs"
+    emacs $*
+  fi
+}
+
+#############################################
+# rails
+
+function jgy-rails-migrate-test() {
+  rake db:migrate RAILS_ENV=test
+}
+
+# Local Variables:
+# mode: sh
+# End:
+
+# vim: set filetype=sh :
+# File managed by personal-kitchen

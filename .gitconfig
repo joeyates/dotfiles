@@ -1,0 +1,156 @@
+[branch]
+  autosetuprebase = always
+[push]
+  default = current
+[core]
+  excludesfile = "~/.gitignore_global"
+[diff]
+  tool = opendiff
+  noprefix = true
+  renameLimit = 5000
+[log]
+  noprefix = true
+[mailmap]
+  file = "~/.gitmailmap"
+[merge]
+  conflictstyle = diff3
+  tool = meld
+[pretty]
+  # logging format: {{sha1}} ({{relevant branches}}) {{title line}} <{{author name, via mailmap}}>
+  # (see `git help log` under "PRETTY FORMATS")
+  tree = tformat:"%Cblue%h -%Creset%C(auto)%d %s <%C(bold green)%aN%Creset>"
+  datedtree = tformat:"%Cblue%h - %cd -%Creset%C(auto)%d %s <%C(bold green)%aN%Creset>"
+[show]
+  noprefix = true
+[user]
+  name = Joe Yates
+  email = joe.g.yates@gmail.com
+  signingkey = BE8BCCD1
+[help]
+  autocorrect = 1
+# For color.* settings see 'Variables' in git help config
+[color]
+  ui = auto
+[color "branch"]
+  current = yellow reverse
+  local = yellow
+  remote = green
+[color "diff"]
+  commit = blue
+  meta = yellow
+  frag = magenta
+  old = red
+  new = green
+[color "status"]
+  added = yellow
+  changed = green
+  untracked = cyan
+[alias]
+  #########################
+  # configuration
+  # list local config (from .git/config)
+  cl                  = config --local --list
+
+  #########################
+  # commits
+  cp                  = cherry-pick
+  
+  #########################
+  # files
+  ls                  = ls-files
+
+  #########################
+  # updating
+  co                  = checkout
+  com                 = checkout master
+  cop                 = checkout production
+  p                   = pull --ff-only
+  ps                  = push
+  fp                  = fetch --all --prune
+
+  #########################
+  # branches
+  b                   = branch
+  # create a local branch that tracks a remote branch
+  bt                  = !sh -c 'git checkout --track -b $0 origin/$0 && git pull'
+  bc                  = checkout -b
+  # create a 'feature/' branch
+  bf                  = !sh -c 'git checkout -b feature/$0'
+  # delete remote branch
+  drb                 = !sh -c 'git push origin :$0'
+
+  #########################
+  # blame
+  # $ git blame-line <FILE> <LINE>
+  blame-line          = !sh -c 'git blame -L $1,$1 $0'
+
+  #########################
+  # staging
+  a                   = add --interactive
+  cm                  = commit
+  cmm                 = commit -m
+  ca                  = commit --amend
+
+  #########################
+  # status
+  s                   = status --short
+  d                   = diff
+  dc                  = diff --color-words
+  dw                  = diff --word-diff
+  # dn {branch}: diff names - shows changed files
+  dn                  = diff --name-status
+  # ds {branch}: diff stats - shows changed files and number of changes
+  ds                  = diff --stat=100,100
+  # di: 'diff index'
+  di                  = diff --cached
+
+  #########################
+  # searching
+  tag-with-commit     = name-rev --name-only
+  history-grep        = log -G
+
+  #########################
+  # history
+  # l - log (short sha + title)
+  l                   = log --pretty=format:\"%h %s\"
+  lp                  = log --patch
+  lns                 = log --name-status
+  # show all branches as a graph
+  tree                = log --all --graph --pretty=tree --abbrev-commit --decorate
+  datedtree           = log --all --graph --pretty=datedtree --abbrev-commit --decorate --date=format:%Y%m%d%H%M%S
+  t                   = !sh -c 'git tree'
+  dt                  = !sh -c 'git datedtree'
+  showns              = show --name-status
+
+  #########################
+  # rebase
+  rebase-branch       = !sh -c 'git fetch && git rebase origin/master'
+  ri                  = rebase --interactive
+  rih                 = !sh -c 'git rebase --interactive HEAD~$0'
+  rc                  = rebase --continue
+  rs                  = rebase --skip
+  # Create a temporary commit as an amendment to a previous commit
+  # then run autosquash for confirmation
+  fix                 = !sh -c 'git commit --fixup $0 && git rebase --interactive --autosquash $0~1'
+
+  #########################
+  # merge
+  m                   = merge
+  mm                  = merge master
+  merge-feature       = !sh -c 'git pull && git merge --no-ff --edit $0'
+  # mf: 'merge feature', creating a merge commit
+  mf                  = merge --no-ff --no-edit
+  # set remote staging to the given branch
+  ss                  = !sh -c 'git push origin +$0:staging'
+  # set remote production to the given branch
+  sp                  = !sh -c 'git push origin +$0:production'
+
+  #########################
+  # the stash
+  # $ git stash-diff <INDEX>
+  stash-diff          = !sh -c 'git stash show stash@{$0} --patience'
+
+[github]
+  user = joeyates
+
+# vim: :set filetype=gitconfig :
