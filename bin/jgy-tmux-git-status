@@ -1,13 +1,19 @@
 #!/usr/bin/env ruby
 
 CONFLICT = /^UU\s/m.freeze
-STAGED = /^M \s/m.freeze
-STAGED_DELETED = /^D /m.freeze
+STAGED = /^[DM].\s/m.freeze
+MODIFIED = /^.[DM]\s/m.freeze
+
+STAGED_DELETED = /^D./m.freeze
+STAGED_MODIFIED = /^M./m.freeze
+UNSTAGED_DELETED = /^.D\s/m.freeze
+UNSTAGED_MODIFIED = /^.M\s/m.freeze
 UNKNOWN = /^\?\?/m.freeze
-UNSTAGED_MODIFIED = /^ M\s/m.freeze
 MAXIMUM_OUTPUT_LENGTH = 30
 
-exit 0 if !File.directory?(".git")
+if `git rev-parse --is-inside-work-tree 2>/dev/null` != "true\n"
+  exit 0
+end
 
 def matches?(s, regexp)
   if RUBY_VERSION > "2.4"
@@ -25,24 +31,36 @@ def repo_status
   `git status --short`
 end
 
-def has_deleted?(status)
-  matches?(status, STAGED_DELETED)
-end
-
-def has_unknown_files?(status)
-  matches?(status, UNKNOWN)
-end
-
 def has_conflicts?(status)
   matches?(status, CONFLICT)
 end
 
+def has_staged?(status)
+  matches?(status, STAGED)
+end
+
 def has_modified?(status)
+  matches?(status, MODIFIED)
+end
+
+def has_staged_deleted?(status)
+  matches?(status, STAGED_DELETED)
+end
+
+def has_staged_modified?(status)
+  matches?(status, STAGED_MODIFIED)
+end
+
+def has_unstaged_deleted?(status)
+  matches?(status, UNSTAGED_DELETED)
+end
+
+def has_unstaged_modified?(status)
   matches?(status, UNSTAGED_MODIFIED)
 end
 
-def has_staged?(status)
-  matches?(status, STAGED)
+def has_unknown_files?(status)
+  matches?(status, UNKNOWN)
 end
 
 def shorten_branch(branch, length)
@@ -58,8 +76,23 @@ status = repo_status
 result = ""
 length = MAXIMUM_OUTPUT_LENGTH
 
-if has_deleted?(status)
+if has_staged_deleted?(status)
   result << "#[fg=yellow]-"
+  length -= 1
+end
+
+if has_staged_modified?(status)
+  result << "#[fg=yellow]M"
+  length -= 1
+end
+
+if has_unstaged_deleted?(status)
+  result << "#[fg=green]-"
+  length -= 1
+end
+
+if has_unstaged_modified?(status)
+  result << "#[fg=green]M"
   length -= 1
 end
 
@@ -68,21 +101,20 @@ if has_unknown_files?(status)
   length -= 1
 end
 
+result = "[#{result}#[fg=white]] " if result != ""
+
 branch = shorten_branch(current_branch, length)
 
 case
 when has_conflicts?(status)
   # Conflict
   result << "#[fg=red]Conflict!"
-when has_modified?(status)
-  # Modified
-  result << "#[fg=green]#{branch}"
 when has_staged?(status)
   # Modification Staged
   result << "#[fg=yellow]#{branch}"
-when has_deleted?(status)
-  # Delete Staged
-  result << "#[fg=yellow]#{branch}"
+when has_modified?(status)
+  # Modified
+  result << "#[fg=green]#{branch}"
 else
   # Clean
   result << "#[fg=white]#{branch}"
