@@ -22,4 +22,10 @@ if [ -x /usr/bin/dircolors ]; then
   alias ls='ls --color=auto'
 fi
 
+# Local Variables:
+# mode: sh
+# End:
+
+# vim: set filetype=sh :
+
 # dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
