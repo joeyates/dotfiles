@@ -34,6 +34,10 @@ export NVM_DIR="/home/joe/.nvm"
 
 export PATH=$NVM_BIN:$PATH
 
+# pass
+
+export PASSWORD_STORE_ENABLE_EXTENSIONS=true
+
 # rbenv
 
 if test -f "$HOME/.rbenv/bin/rbenv" ; then
