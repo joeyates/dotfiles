@@ -12,4 +12,4 @@ parse_git_dirty() {
 ref=$(git symbolic-ref HEAD 2> /dev/null) || exit
 echo "${ref#refs/heads/}$(parse_git_dirty)"
 
-# Installed by chef from 'personal-kitchen'
+# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles

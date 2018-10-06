@@ -43,4 +43,5 @@ alias tmr='tmux-rails'
 if [ -f ~/.bash_aliases ]; then
   . ~/.bash_aliases
 fi
-# File managed by personal-kitchen
+
+# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles

@@ -64,4 +64,5 @@ export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 # 4. chop off the extra ':' from the end
 #                    1                      2               3             4
 export PATH=`tr ':' '\n' <<< $PATH | awk '!a[$0]++' | tr '\n' ':' | sed 's/.$//'`
-# File managed by personal-kitchen
+
+# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles

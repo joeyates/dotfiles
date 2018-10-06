@@ -15,4 +15,5 @@ export KIEX_ELIXIR_VERSION=elixir-1.6.4
 
 kiex default $KIEX_ELIXIR_VERSION > /dev/null 2>&1
 kiex use $KIEX_ELIXIR_VERSION > /dev/null
-# File managed by personal-kitchen
+
+# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles

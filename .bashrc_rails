@@ -5,4 +5,5 @@ alias rs='rails server -b 0.0.0.0'
 alias rspf='rspec --only-failures'
 alias rswb='rails server webrick'
 alias ss='spring stop'
-# File managed by personal-kitchen
+
+# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles

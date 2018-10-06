@@ -12,4 +12,4 @@ sort \
 # Short version:
 # $ du -BM -d1 -x | sort -rn
 
-# Installed by chef from 'personal-kitchen'
+# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles

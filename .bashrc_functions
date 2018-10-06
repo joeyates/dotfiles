@@ -131,4 +131,5 @@ function jgy-rails-migrate-test() {
 # End:
 
 # vim: set filetype=sh :
-# File managed by personal-kitchen
+
+# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
