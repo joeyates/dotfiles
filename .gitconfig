@@ -103,6 +103,8 @@
   ds                  = diff --stat=100,100
   # di: 'diff index'
   di                  = diff --cached
+  # untracked: list all untracked files and directories
+  untracked           = !sh -c 'git clean -nffdx | sed -r "s/Would\\ remove\\ //"'
 
   #########################
   # searching
