@@ -18,7 +18,6 @@ alias e=jgy-edit
 alias en='jgy-edit-no-session'
 alias f=jgy-everyday-find
 alias g='git'
-_xfunc git __git_complete g _git
 alias gde='gist_directory edit'
 alias gdv='gist_directory view'
 alias gk='gitk --all'
