@@ -115,7 +115,7 @@ function jgy-edit {
     emacsclient --alternate-editor="" --no-wait $*
   else
     # not running - use emacs"
-    emacs $*
+    TERM=xterm-24bits emacs $*
   fi
 }
 
