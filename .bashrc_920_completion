@@ -16,3 +16,16 @@ if jgy-alias-exists g ;
 then
   _xfunc git __git_complete g _git
 fi
+
+# pass password manager
+
+pass_completion_path=~/opt/password-store/src/completion/pass.bash-completion
+
+if [ -f $pass_completion_path ] ;
+then
+  . ~/opt/password-store/src/completion/pass.bash-completion
+  if jgy-alias-exists p ;
+  then
+    complete -o filenames -F _pass p
+  fi
+fi
