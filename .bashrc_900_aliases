@@ -1,11 +1,3 @@
-function jgy-ack-command() {
-  if which ack-grep >/dev/null ; then
-    echo ack-grep
-  elif which ag >/dev/null ; then
-    echo ag
-  fi
-}
-
 if [ jgy-ack-command ]; then
   alias a=`jgy-ack-command`
   alias aw='jgy-grep-word'
@@ -35,7 +27,13 @@ if which trash-put >/dev/null ; then
   alias t='trash-put'
 fi
 
+alias r=rails
+alias rdbm='rails db:migrate'
+alias rdbmt='rails db:migrate RAILS_ENV=test'
 alias rpc='pry -r ./config/environment'
+alias rs='rails server -b 0.0.0.0'
+alias rspf='rspec --only-failures'
+alias rswb='rails server webrick'
 alias tmux-rails='tmux attach -t rails || tmux new-session -s rails \; source-file ~/.tmux/rails-session.conf \; attach'
 alias ta='tmux attach'
 alias tmr='tmux-rails'

@@ -1,4 +1,12 @@
-#!/usr/bin/env bash
+#############################
+# bash scripting related
+
+function jgy-function-exists() {
+  type -t $1 >/dev/null
+}
+
+#############################
+# finding stuff
 
 # f - everyday find
 # usage:
@@ -22,10 +30,6 @@ unset _exclude_matches _excludes _match
 
 function jgy-timestamp {
   date +%Y%m%d%H%M%S
-}
-
-function deactivate_virtualenv() {
-  type deactivate >/dev/null 2>/dev/null && deactivate
 }
 
 function jgy-clear-screen() {
@@ -77,26 +81,6 @@ function jgy-ssh-keygen-usage() {
 }
 
 ##########################################
-# SSL/TLS
-
-function jgy-online-certificate {
-  local hostname=$1
-  shift
-  echo | \
-  openssl s_client \
-  -connect $hostname:443 \
-  -servername $hostname \
-  2>/dev/null
-}
-
-function jgy-certificate-expiry {
-  local hostname=$1
-  shift
-  jgy-online-certificate $hostname | \
-  openssl x509 -inform pem -noout -enddate
-}
-
-##########################################
 # emacs
 
 function jgy-is-emacs-running {
@@ -117,13 +101,6 @@ function jgy-edit {
     # not running - use emacs"
     TERM=xterm-24bits emacs $*
   fi
-}
-
-#############################################
-# rails
-
-function jgy-rails-migrate-test() {
-  rake db:migrate RAILS_ENV=test
 }
 
 # Local Variables:

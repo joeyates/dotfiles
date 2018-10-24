@@ -1,9 +1,0 @@
-alias r=rails
-alias rdbm='rails db:migrate'
-alias rdbmt='rails db:migrate RAILS_ENV=test'
-alias rs='rails server -b 0.0.0.0'
-alias rspf='rspec --only-failures'
-alias rswb='rails server webrick'
-alias ss='spring stop'
-
-# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
