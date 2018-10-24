@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BYTES=${1:-32)}
+BYTES=${1:-32}
 openssl rand -hex $BYTES
 
 # dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
