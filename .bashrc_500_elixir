@@ -9,7 +9,7 @@ export KERL_ERLANG_VERSION=20.0.1
 
 # kiex
 
-export KIEX_ELIXIR_VERSION=elixir-1.6.4
+export KIEX_ELIXIR_VERSION=elixir-1.7.3
 
 [[ -s "$HOME/.kiex/scripts/kiex" ]] && source "$HOME/.kiex/scripts/kiex"
 
