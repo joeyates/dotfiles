@@ -13,16 +13,12 @@ export LC_ALL=en_GB.UTF-8
 
 ########################
 # source computer-specific configurations
+
 for i in ~/.bashrc_*; do
   if [ -f "$i" ] ; then
     source $i;
   fi
 done
-
-if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
-  . /etc/bash_completion
-  _xfunc git __git_complete g _git
-fi
 
 # Heroku
 

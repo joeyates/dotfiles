@@ -1,0 +1,18 @@
+if [ ! -f /etc/bash_completion ] ; then
+  return
+fi
+
+if shopt -oq posix; then
+  return
+fi
+
+# General completion setup
+
+. /etc/bash_completion
+
+# Git
+
+if jgy-alias-exists g ;
+then
+  _xfunc git __git_complete g _git
+fi

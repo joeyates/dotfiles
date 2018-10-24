@@ -40,8 +40,8 @@ alias tmux-rails='tmux attach -t rails || tmux new-session -s rails \; source-fi
 alias ta='tmux attach'
 alias tmr='tmux-rails'
 
-if [ -f ~/.bash_aliases ]; then
-  . ~/.bash_aliases
-fi
+function jgy-alias-exists() {
+  alias $1 2>/dev/null >/dev/null
+}
 
 # dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
