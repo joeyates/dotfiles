@@ -6,13 +6,36 @@
 [keybindings]
 [layouts]
   [[default]]
-    [[[child1]]]
-      parent = window0
+    [[[root]]]
+      fullscreen = True
+      last_active_term = 267b6039-4cc5-4a42-a7bc-b684ec562f10
+      last_active_window = True
+      maximised = False
+      order = 0
+      parent = ""
+      position = 0:0
+      size = 1920, 1080
+      title = terminal
+      type = Window
+    [[[split]]]
+      order = 0
+      parent = root
+      type = HPaned
+    [[[terminal2]]]
+      directory = /home/joe
+      order = 0
+      parent = split
       profile = default
       type = Terminal
-    [[[window0]]]
-      parent = ""
-      type = Window
+      uuid = 267b6039-4cc5-4a42-a7bc-b684ec562f10
+    [[[terminal3]]]
+      directory = /home/joe
+      command = jgy-tmux-start
+      order = 1
+      parent = split
+      profile = default
+      type = Terminal
+      uuid = 414cc987-66aa-4720-869b-14b245aba1c7
 [plugins]
 [profiles]
   [[default]]
