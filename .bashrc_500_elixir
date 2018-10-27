@@ -5,7 +5,12 @@ export OTP_GITHUB_URL="https://github.com/erlang/otp"
 export ERL_AFLAGS="-kernel shell_history enabled"
 export KERL_ERLANG_VERSION=20.0.1
 
-. /home/joe/.kerl/installs/$KERL_ERLANG_VERSION/activate
+activate_default_erlang_path=/home/joe/.kerl/installs/$KERL_ERLANG_VERSION/activate
+
+if [ -s "$activate_default_erlang_path" ]
+then
+  . $activate_default_erlang_path
+fi
 
 # kiex
 
