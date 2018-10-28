@@ -6,6 +6,7 @@ MODIFIED = /^.[DM]\s/m.freeze
 
 STAGED_DELETED = /^D./m.freeze
 STAGED_MODIFIED = /^M./m.freeze
+STAGED_RENAMED = /^R./m.freeze
 UNSTAGED_DELETED = /^.D\s/m.freeze
 UNSTAGED_MODIFIED = /^.M\s/m.freeze
 UNKNOWN = /^\?\?/m.freeze
@@ -51,6 +52,10 @@ def has_staged_modified?(status)
   matches?(status, STAGED_MODIFIED)
 end
 
+def has_staged_renamed?(status)
+  matches?(status, STAGED_RENAMED)
+end
+
 def has_unstaged_deleted?(status)
   matches?(status, UNSTAGED_DELETED)
 end
@@ -83,6 +88,11 @@ end
 
 if has_staged_modified?(status)
   result << "#[fg=yellow]M"
+  length -= 1
+end
+
+if has_staged_renamed?(status)
+  result << "#[fg=yellow]R"
   length -= 1
 end
 
