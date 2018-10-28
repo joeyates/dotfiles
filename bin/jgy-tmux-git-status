@@ -4,6 +4,7 @@ CONFLICT = /^UU\s/m.freeze
 STAGED = /^[DM].\s/m.freeze
 MODIFIED = /^.[DM]\s/m.freeze
 
+STAGED_ADDED = /^A./m.freeze
 STAGED_DELETED = /^D./m.freeze
 STAGED_MODIFIED = /^M./m.freeze
 STAGED_RENAMED = /^R./m.freeze
@@ -44,6 +45,10 @@ def has_modified?(status)
   matches?(status, MODIFIED)
 end
 
+def has_staged_added?(status)
+  matches?(status, STAGED_ADDED)
+end
+
 def has_staged_deleted?(status)
   matches?(status, STAGED_DELETED)
 end
@@ -80,6 +85,11 @@ end
 status = repo_status
 result = ""
 length = MAXIMUM_OUTPUT_LENGTH
+
+if has_staged_added?(status)
+  result << "#[fg=yellow]+"
+  length -= 1
+end
 
 if has_staged_deleted?(status)
   result << "#[fg=yellow]-"
