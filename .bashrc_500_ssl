@@ -1,0 +1,19 @@
+##########################################
+# SSL/TLS
+
+function jgy-online-certificate {
+  local hostname=$1
+  shift
+  echo | \
+  openssl s_client \
+  -connect $hostname:443 \
+  -servername $hostname \
+  2>/dev/null
+}
+
+function jgy-certificate-expiry {
+  local hostname=$1
+  shift
+  jgy-online-certificate $hostname | \
+  openssl x509 -inform pem -noout -enddate
+}

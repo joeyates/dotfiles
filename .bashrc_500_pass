@@ -1,0 +1,3 @@
+export PASSWORD_STORE_ENABLE_EXTENSIONS=true
+
+# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
