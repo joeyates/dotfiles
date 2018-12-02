@@ -1,9 +1,4 @@
 [global_config]
-  enabled_plugins = CustomCommandsMenu,
-  inactive_color_offset = 1.0
-  suppress_multiple_term_dialog = True
-  tab_position = hidden
-  title_font = Inconsolata 15
   title_use_system_font = False
 [keybindings]
 [layouts]
@@ -24,6 +19,7 @@
       parent = root
       type = HPaned
     [[[terminal2]]]
+      command = ""
       directory = /home/joe
       order = 0
       parent = split
@@ -31,8 +27,8 @@
       type = Terminal
       uuid = 267b6039-4cc5-4a42-a7bc-b684ec562f10
     [[[terminal3]]]
-      directory = /home/joe
       command = jgy-tmux-start
+      directory = /home/joe
       order = 1
       parent = split
       profile = default
@@ -47,7 +43,7 @@
     cursor_color_fg = False
     cursor_shape = ibeam
     font = Inconsolata 15
-    foreground_color = "#eee8d5"
+    foreground_color = "#839496"
     icon_bell = False
     palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
     scrollbar_position = hidden
