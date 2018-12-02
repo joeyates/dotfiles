@@ -87,18 +87,18 @@ function jgy-is-emacs-running {
   pgrep -x emacs >/dev/null
 }
 
-function jgy-edit { 
-  if [ ! -f ".emacs.desktop" ]; then
-    # If there is no saved session,
-    # stop emacs searching in parent directories
-    touch .emacs.desktop
-  fi
+function jgy-edit {
   if jgy-is-emacs-running
   then
     # running - use emacsclient
     emacsclient --alternate-editor="" --no-wait $*
   else
     # not running - use emacs"
+    if [ ! -f ".emacs.desktop" ]; then
+      # If there is no saved session,
+      # stop emacs searching in parent directories
+      touch .emacs.desktop
+    fi
     TERM=xterm-24bits emacs $*
   fi
 }
