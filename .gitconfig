@@ -15,11 +15,6 @@
 [merge]
   conflictstyle = diff3
   tool = meld
-[pretty]
-  # logging format: {{sha1}} ({{relevant branches}}) {{title line}} <{{author name, via mailmap}}>
-  # (see `git help log` under "PRETTY FORMATS")
-  tree = tformat:"%Cblue%h -%Creset%C(auto)%d %s <%C(bold green)%aN%Creset>"
-  datedtree = tformat:"%Cblue%h - %cd -%Creset%C(auto)%d %s <%C(bold green)%aN%Creset>"
 [show]
   noprefix = true
 [user]
@@ -117,11 +112,6 @@
   l                   = log --pretty=format:\"%h %s\"
   lp                  = log --patch
   lns                 = log --name-status
-  # show all branches as a graph
-  tree                = log --all --graph --pretty=tree --abbrev-commit --decorate
-  datedtree           = log --all --graph --pretty=datedtree --abbrev-commit --decorate --date=format:%Y%m%d%H%M%S
-  t                   = !sh -c 'git tree'
-  dt                  = !sh -c 'git datedtree'
   showns              = show --name-status
 
   #########################
@@ -154,5 +144,13 @@
 
 [github]
   user = joeyates
+
+[tig]
+  main-view = author:full commit-title:yes,graph=v2,refs=yes
+  blame-view = author:full file-name:auto id:yes,color=yes text
+  mailmap = true # Replace author names with entries from ~/.gitmailmap
+  line-graphics = utf-8 # Draw pretty connectors in tree layout
+  #refresh-mode = periodic # Periodic (and auto) refresh does not seem to work
+  #refresh-interval = 1
 
 # vim: :set filetype=gitconfig :
