@@ -1,15 +1,5 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
-shopt -s checkwinsize
-
-# Include the current directory in **/* glob expansions
-shopt -s globstar
-
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
-export LANGUAGE=en_GB.UTF-8
-export LANG=en_GB.UTF-8
-export LC_ALL=en_GB.UTF-8
 
 ########################
 # source configurations
