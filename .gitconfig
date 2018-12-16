@@ -47,18 +47,12 @@
   cl                  = config --local --list
 
   #########################
-  # commits
-  cp                  = cherry-pick
-  
-  #########################
   # files
   ls                  = ls-files
 
   #########################
   # updating
   co                  = checkout
-  com                 = checkout master
-  cop                 = checkout production
   p                   = pull --ff-only
   ps                  = push
   fp                  = fetch --all --prune
@@ -103,7 +97,6 @@
 
   #########################
   # searching
-  tag-with-commit     = name-rev --name-only
   history-grep        = log -G
 
   #########################
@@ -118,7 +111,6 @@
   # rebase
   rebase-branch       = !sh -c 'git fetch && git rebase origin/master'
   ri                  = rebase --interactive
-  rih                 = !sh -c 'git rebase --interactive HEAD~$0'
   rc                  = rebase --continue
   rs                  = rebase --skip
   # Create a temporary commit as an amendment to a previous commit
