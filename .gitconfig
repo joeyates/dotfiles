@@ -84,7 +84,7 @@
   a                   = add --interactive
   cm                  = commit
   cmm                 = commit -m
-  ca                  = commit --amend
+  ca                  = commit --amend --no-edit
 
   #########################
   # status
