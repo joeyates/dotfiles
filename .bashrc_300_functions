@@ -33,7 +33,8 @@ function jgy-timestamp {
 }
 
 function jgy-clear-screen() {
-  local lines=`tput lines`
+  local screen_height=`tput lines`
+  lines=${1:-$screen_height}
 
   for i in $(seq 1 $lines)
   do
