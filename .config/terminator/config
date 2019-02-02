@@ -1,4 +1,7 @@
 [global_config]
+  enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
+  inactive_color_offset = 0.65641025641
+  title_transmit_fg_color = "#edd400"
   title_use_system_font = False
 [keybindings]
 [layouts]
