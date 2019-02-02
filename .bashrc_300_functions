@@ -28,6 +28,14 @@ function jgy-everyday-find() {
 "
 unset _exclude_matches _excludes _match
 
+function jgy-find-open-first() {
+  local first=$(jgy-everyday-find $* | head --lines=1)
+  if [ "x${first}x" == "xx" ]; then
+    return -1
+  fi
+  jgy-edit $first
+}
+
 function jgy-timestamp {
   date +%Y%m%d%H%M%S
 }
