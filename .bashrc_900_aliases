@@ -17,7 +17,6 @@ alias l1='ls -1A'
 alias la='ls -lA'
 alias lh='ls -lhA'
 alias ltr='ls -lAtr'
-alias ll='l'
 alias p=pass
 
 if which trash-put >/dev/null ; then
