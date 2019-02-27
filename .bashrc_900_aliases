@@ -13,6 +13,7 @@ fi
 
 alias b=bundle
 alias c=jgy-clear-screen
+alias cig='curl -IXGET'
 alias dw=jgy-word-diff
 alias e=jgy-edit
 alias en='jgy-edit-no-session'
