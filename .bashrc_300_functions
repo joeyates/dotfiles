@@ -23,6 +23,7 @@ function jgy-everyday-find() {
   find \$2 \
     $_excludes \
     -iname \"*\$1*\"    \
+    -type f \
     -print;
 }
 "
