@@ -1,6 +1,14 @@
-if [ jgy-ack-command ]; then
-  alias a=`jgy-ack-command`
+if type jgy-grep > /dev/null ; then
+  alias a='jgy-grep'
+fi
+if type jgy-grep-case-insensitive > /dev/null ; then
+  alias ai='jgy-grep-case-insensitive'
+fi
+if type jgy-grep-word > /dev/null ; then
   alias aw='jgy-grep-word'
+fi
+if type jgy-grep-word-case-insensitive > /dev/null ; then
+  alias awi='jgy-grep-word-case-insensitive'
 fi
 
 alias b=bundle
