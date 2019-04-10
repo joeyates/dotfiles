@@ -19,7 +19,7 @@ for _match in ${_exclude_matches[@]}; do
 done
 
 eval "
-function jgy-everyday-find() {
+function jgy-find-files() {
   find \$2 \
     $_excludes \
     -iname \"*\$1*\"    \
@@ -27,10 +27,30 @@ function jgy-everyday-find() {
     -print;
 }
 "
+
+eval "
+function jgy-find-directories() {
+  find \$2 \
+    $_excludes \
+    -iname \"*\$1*\"    \
+    -type d \
+    -print;
+}
+"
+
+eval "
+function jgy-find-files-and-directories() {
+  find \$2 \
+    $_excludes \
+    -iname \"*\$1*\"    \
+    -print;
+}
+"
+
 unset _exclude_matches _excludes _match
 
 function jgy-find-open-first() {
-  local first=$(jgy-everyday-find $* | head --lines=1)
+  local first=$(jgy-find-files $* | head --lines=1)
   if [ "x${first}x" == "xx" ]; then
     return -1
   fi
