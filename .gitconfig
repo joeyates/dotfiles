@@ -1,9 +1,9 @@
+[core]
+  excludesfile = "~/.gitignore_global"
 [branch]
   autosetuprebase = always
 [push]
   default = current
-[core]
-  excludesfile = "~/.gitignore_global"
 [diff]
   tool = opendiff
   noprefix = true
