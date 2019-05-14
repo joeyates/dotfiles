@@ -91,7 +91,11 @@
   # di: 'diff index'
   di                  = diff --cached
   # untracked: list all untracked files and directories
-  untracked           = !sh -c 'git clean -nffdx | sed -r "s/Would\\ remove\\ //"'
+  untracked           = "!f() {\
+                           local path=${1:-.}; \
+                           local matches=\"`git clean -nffdx $path`\"; \
+                           echo \"$matches\" | sed -r \"s/Would\\ remove\\ //\"; \
+                         }; f"
 
   #########################
   # searching
