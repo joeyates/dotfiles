@@ -99,6 +99,26 @@ if which ack-grep >/dev/null ; then
     shift
     ack-grep -i "\b$pattern\b" $*
   }
+elif which ack >/dev/null ; then
+  function jgy-grep() {
+    ack $*
+  }
+
+  function jgy-grep-case-insensitive() {
+    ack -i "$*"
+  }
+
+  function jgy-grep-word() {
+    local pattern=$1
+    shift
+    ack "\b$pattern\b" "$*"
+  }
+
+  function jgy-grep-word-case-insensitive() {
+    local pattern=$1
+    shift
+    ack -i "\b$pattern\b" "$*"
+  }
 elif which ag >/dev/null ; then
   function jgy-grep() {
     ag --case-sensitive $*
