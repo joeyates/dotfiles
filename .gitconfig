@@ -86,8 +86,6 @@
   d                   = diff
   dc                  = diff --color-words
   dw                  = diff --word-diff
-  # dn {branch}: diff names - shows changed files
-  dn                  = diff --name-status
   # ds {branch}: diff stats - shows changed files and number of changes
   ds                  = diff --stat=100,100
   # di: 'diff index'
@@ -104,8 +102,6 @@
   # l - log (short sha + title)
   l                   = log --pretty=format:\"%h %s\"
   lp                  = log --patch
-  lns                 = log --name-status
-  showns              = show --name-status
 
   #########################
   # rebase
@@ -118,16 +114,8 @@
   fix                 = !sh -c 'git commit --fixup $0 && git rebase --interactive --autosquash $0~1'
 
   #########################
-  # merge
-  m                   = merge
-  mm                  = merge master
-  merge-feature       = !sh -c 'git pull && git merge --no-ff --edit $0'
   # mf: 'merge feature', creating a merge commit
   mf                  = merge --no-ff --no-edit
-  # set remote staging to the given branch
-  ss                  = !sh -c 'git push origin +$0:staging'
-  # set remote production to the given branch
-  sp                  = !sh -c 'git push origin +$0:production'
 
   #########################
   # the stash
