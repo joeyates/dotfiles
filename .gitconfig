@@ -1,7 +1,7 @@
 [core]
   excludesfile = "~/.gitignore_global"
-[branch]
-  autosetuprebase = always
+[pull]
+  rebase = true
 [push]
   default = current
 [diff]
@@ -53,7 +53,7 @@
   #########################
   # updating
   co                  = checkout
-  p                   = pull --ff-only
+  p                   = pull
   ps                  = push
   fp                  = fetch --all --prune
 
