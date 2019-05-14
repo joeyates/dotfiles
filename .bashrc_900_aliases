@@ -43,7 +43,8 @@ alias rs='rails server -b 0.0.0.0'
 alias rspf='rspec --only-failures'
 alias rswb='rails server webrick'
 alias ta='tmux attach'
-alias tg='tig --all'
+alias tg='tig `git branch`'
+alias tga='tig --all'
 alias tmr='jgy-tmux-start'
 
 function jgy-alias-exists() {
