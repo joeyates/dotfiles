@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 PG_VERSION=${1:-10}
+VOLUME=${2:-pg$PG_VERSION}
 
 docker \
   run \
   --publish 5432:5432 \
-  --volume pg$PG_VERSION:/var/lib/postgresql/data \
+  --volume $VOLUME:/var/lib/postgresql/data \
   postgres:$PG_VERSION
