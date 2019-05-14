@@ -3,10 +3,10 @@
 export NVM_DIR="/home/joe/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
-export PATH=$NVM_BIN:$PATH
+export PATH=$PATH:$NVM_BIN
 
 # Ease access to project scripts
 
-export PATH=./node_modules/.bin:$PATH
+export PATH=$PATH:./node_modules/.bin
 
 # dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
