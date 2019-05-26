@@ -75,7 +75,8 @@
 
   #########################
   # staging
-  a                   = add --interactive
+  a                   = add --patch
+  ai                  = add --interactive
   cm                  = commit
   cmm                 = commit -m
   ca                  = commit --amend --no-edit
