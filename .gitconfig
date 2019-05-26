@@ -79,6 +79,7 @@
   cm                  = commit
   cmm                 = commit -m
   ca                  = commit --amend --no-edit
+  cae                 = commit --amend
 
   #########################
   # status
