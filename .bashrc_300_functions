@@ -111,13 +111,13 @@ elif which ack >/dev/null ; then
   function jgy-grep-word() {
     local pattern=$1
     shift
-    ack "\b$pattern\b" "$*"
+    ack "\b$pattern\b" $*
   }
 
   function jgy-grep-word-case-insensitive() {
     local pattern=$1
     shift
-    ack -i "\b$pattern\b" "$*"
+    ack -i "\b$pattern\b" $*
   }
 elif which ag >/dev/null ; then
   function jgy-grep() {
