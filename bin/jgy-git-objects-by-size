@@ -1,0 +1,18 @@
+#!/bin/bash -e
+
+# Adapted from: https://gist.github.com/magnetikonline/dd5837d597722c9c2d5dfa16d8efe5b9
+
+files=$(mktemp)
+IFS=$'\n'
+
+# Create a list of all committed files and sizes
+for commit in $(git rev-list --all); do
+  git ls-tree -r --long "$commit" >> "$files"
+done
+
+# Sort files by commit, de-dupe and re-sort by filesize
+sort --key 3 "$files" | \
+  uniq | \
+  sort --key 4 --numeric-sort --reverse
+
+rm "$files"
