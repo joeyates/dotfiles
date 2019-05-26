@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require "securerandom"
+
+BYTES = ARGV[1] || 60
+
+puts SecureRandom.alphanumeric(BYTES)
