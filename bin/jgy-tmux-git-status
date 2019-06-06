@@ -34,18 +34,6 @@ def repo_status
   `git status --short`
 end
 
-def has_conflicts?(status)
-  matches?(status, CONFLICT)
-end
-
-def has_staged?(status)
-  matches?(status, STAGED)
-end
-
-def has_modified?(status)
-  matches?(status, MODIFIED)
-end
-
 def shorten_branch(branch, length)
   b = branch.gsub(%r{^feature/}, "f/")
   if b.length > length
@@ -80,13 +68,13 @@ result = "[#{result}#[fg=white]] " if result != ""
 branch = shorten_branch(current_branch, length)
 
 case
-when has_conflicts?(status)
+when matches?(status, CONFLICT)
   # Conflict
   result << "#[fg=red]Conflict!"
-when has_staged?(status)
+when matches?(status, STAGED)
   # Modification Staged
   result << "#[fg=yellow]#{branch}"
-when has_modified?(status)
+when matches?(status, MODIFIED)
   # Modified
   result << "#[fg=green]#{branch}"
 else
