@@ -45,34 +45,6 @@ def has_modified?(status)
   matches?(status, MODIFIED)
 end
 
-def has_staged_added?(status)
-  matches?(status, STAGED_ADDED)
-end
-
-def has_staged_deleted?(status)
-  matches?(status, STAGED_DELETED)
-end
-
-def has_staged_modified?(status)
-  matches?(status, STAGED_MODIFIED)
-end
-
-def has_staged_renamed?(status)
-  matches?(status, STAGED_RENAMED)
-end
-
-def has_unstaged_deleted?(status)
-  matches?(status, UNSTAGED_DELETED)
-end
-
-def has_unstaged_modified?(status)
-  matches?(status, UNSTAGED_MODIFIED)
-end
-
-def has_unknown_files?(status)
-  matches?(status, UNKNOWN)
-end
-
 def shorten_branch(branch, length)
   b = branch.gsub(%r{^feature/}, "f/")
   if b.length > length
@@ -86,39 +58,19 @@ status = repo_status
 result = ""
 length = MAXIMUM_OUTPUT_LENGTH
 
-if has_staged_added?(status)
-  result << "#[fg=yellow]+"
-  length -= 1
-end
-
-if has_staged_deleted?(status)
-  result << "#[fg=yellow]-"
-  length -= 1
-end
-
-if has_staged_modified?(status)
-  result << "#[fg=yellow]M"
-  length -= 1
-end
-
-if has_staged_renamed?(status)
-  result << "#[fg=yellow]R"
-  length -= 1
-end
-
-if has_unstaged_deleted?(status)
-  result << "#[fg=green]-"
-  length -= 1
-end
-
-if has_unstaged_modified?(status)
-  result << "#[fg=green]M"
-  length -= 1
-end
-
-if has_unknown_files?(status)
-  result << "#[fg=cyan]+"
-  length -= 1
+{
+  STAGED_ADDED      => "#[fg=yellow]+",
+  STAGED_DELETED    => "#[fg=yellow]-",
+  STAGED_MODIFIED   => "#[fg=yellow]M",
+  STAGED_RENAMED    => "#[fg=yellow]R",
+  UNSTAGED_DELETED  => "#[fg=green]-",
+  UNSTAGED_MODIFIED => "#[fg=green]M",
+  UNKNOWN           => "#[fg=cyan]+"
+}.each do |match, marker|
+  if matches?(status, match)
+    result << marker
+    length -= 1
+  end
 end
 
 result = "[#{result}#[fg=white]] " if result != ""
