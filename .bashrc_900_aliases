@@ -43,7 +43,7 @@ alias rs='rails server -b 0.0.0.0'
 alias rspf='rspec --only-failures'
 alias rswb='rails server webrick'
 alias ta='tmux attach'
-alias tg='tig `git branch`'
+alias tg='tig `git rev-parse --abbrev-ref HEAD`'
 alias tga='tig --all'
 alias tmr='jgy-tmux-start'
 
