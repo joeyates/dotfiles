@@ -72,6 +72,7 @@
   # blame
   # $ git blame-line <FILE> <LINE>
   blame-line          = !sh -c 'git blame -L $1,$1 $0'
+  line-history        = !sh -c 'git log --pretty=short -u -L $1,$1:$0'
 
   #########################
   # staging
