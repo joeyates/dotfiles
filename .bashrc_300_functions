@@ -101,11 +101,15 @@ if which ack-grep >/dev/null ; then
   }
 elif which ack >/dev/null ; then
   function jgy-grep() {
-    ack $*
+    local pattern=$1
+    shift
+    ack "$pattern" $*
   }
 
   function jgy-grep-case-insensitive() {
-    ack -i "$*"
+    local pattern=$1
+    shift
+    ack -i "$pattern" $*
   }
 
   function jgy-grep-word() {
