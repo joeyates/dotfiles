@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PG_VERSION=${1:-10}
+PG_VERSION=${1:-12}
 VOLUME=${2:-pg$PG_VERSION}
 
 docker \
