@@ -5,6 +5,7 @@
 /.bundle/
 /.byebug_history
 /cover/
+/coverage/
 /deps/
 .DS_Store
 .emacs.desktop
