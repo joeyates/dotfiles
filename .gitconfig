@@ -111,6 +111,7 @@
   # l - log (short sha + title)
   l                   = log --pretty=format:\"%h %s\"
   lp                  = log --patch
+  lns                 = log --name-status
 
   #########################
   # rebase
