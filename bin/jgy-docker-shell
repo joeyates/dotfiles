@@ -2,4 +2,4 @@
 
 SERVICE=$1
 
-docker exec -ti `docker ps -a | grep "$SERVICE" | cut -d ' ' -f 1` /bin/bash
+docker exec -ti `docker ps | grep "$SERVICE" | cut -d ' ' -f 1` /bin/bash
