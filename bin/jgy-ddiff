@@ -1,5 +1,5 @@
 #!/bin/sh
 
-diff -qr $1 $2 | grep -v '/.git/' | sort
+diff -qr $1 $2 | grep -v '/.git' | sort
 
 # dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
