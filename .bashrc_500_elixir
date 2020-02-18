@@ -14,7 +14,7 @@ fi
 
 # kiex
 
-export KIEX_ELIXIR_VERSION=elixir-1.7.3
+export KIEX_ELIXIR_VERSION=elixir-1.9.0
 
 [[ -s "$HOME/.kiex/scripts/kiex" ]] && source "$HOME/.kiex/scripts/kiex"
 
