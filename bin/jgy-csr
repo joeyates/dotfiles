@@ -40,7 +40,7 @@ parser = OptionParser.new do |opts|
     "-d",
     "--domain [DOMAIN]",
     "The domain name - used as the base name of files"
-  ) do |remote|
+  ) do |domain|
     options[:domain] = domain
   end
 
@@ -48,7 +48,7 @@ parser = OptionParser.new do |opts|
     "-c",
     "--config [DOMAIN]",
     "The configuration file"
-  ) do |remote|
+  ) do |config|
     options[:config] = config
   end
 
