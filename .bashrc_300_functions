@@ -42,8 +42,8 @@ eval "
 function jgy-find-files-and-directories() {
   find \$2 \
     $_excludes \
-    -iname \"*\$1*\"    \
-    -print;
+    -ipath \"*\$1*\"    \
+    -print | sort;
 }
 "
 
