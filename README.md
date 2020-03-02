@@ -1,3 +1,3 @@
 # My Dotfiles Repo
 
-See [here](http://joeyates.info/2018/12/16/dotfiles/) for setup instructions.
+See [here](https://joeyates.info/2018/12/16/dotfiles/) for setup instructions.
