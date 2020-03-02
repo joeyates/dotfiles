@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+input_file = ARGV[0]
+
+input = File.read(input_file)
+
+output_file = input_file + ".cr"
+
+output = input.tr("\n", 0x0d.chr)
+
+File.write(output_file, output)

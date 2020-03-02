@@ -1,0 +1,79 @@
+#!/usr/bin/env ruby
+
+require "fileutils"
+require "optparse"
+
+options = {}
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: #{__FILE__} [options]"
+
+  opts.on(
+    "-p",
+    "--path PATH",
+    "The path to check"
+  ) do |value|
+    options[:path] = value
+  end
+end
+
+parser.parse!
+
+if !options[:path]
+  raise "Supply --path PATH"
+end
+
+path = options[:path]
+
+if !File.directory?(path)
+  raise "Directory '#{path}' does not exist"
+end
+
+def git_repo?(path)
+  File.directory?(File.join(path, ".git"))
+end
+
+def directories(path)
+  Dir.entries(path).
+    filter { |p| File.directory?(File.join(path, p)) }.
+    reject { |p| p == "." || p == ".." }
+end
+
+def nested_git_repos(path)
+  first_level = directories(path)
+
+  paths = first_level.flat_map do |entry|
+    full_path = File.join(path, entry)
+    if git_repo?(full_path)
+      entry
+    else
+      ds = directories(full_path)
+      repos = ds.filter do |d|
+        sub_path = File.join(full_path, d)
+        git_repo?(sub_path)
+      end
+      repos.map { |r| File.join(entry, r) }
+    end
+  end.sort
+end
+
+def uncommitted?(path)
+  u = `(cd #{path} && git status --short)`
+  u != ""
+end
+
+def unpushed?(path)
+  u = `(cd #{path} && git log --branches --not --remotes --format=oneline)`
+  u != ""
+end
+
+paths = nested_git_repos(path)
+
+paths.each do |p|
+  full_path = File.join(path, p)
+  untracked = uncommitted?(full_path)
+  unpushed = unpushed?(full_path)
+  if untracked || unpushed
+    puts full_path
+  end
+end

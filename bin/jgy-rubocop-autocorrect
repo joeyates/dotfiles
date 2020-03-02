@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+rubocop --auto-correct --only $1

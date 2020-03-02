@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+require "fileutils"
+require "rake"
+
+ROOT = File.expand_path(ARGV[0] || ".", Dir.pwd)
+ANDROID_MATCH = /
+  \/                # The whole file name
+  (IMG|VID)         # starts with an image or film indicator.
+  _                 # An underscore is followed by
+  (?<year>\d{4})    # year,
+  (?<month>\d{2})   # month,
+  (?<day>\d{2})     # and day.
+  _                 # Another underscore is followed by
+  (?<time>[^\.]+)   # time
+  \.
+  (?<extension>\w+) # An extension
+  $                 # completes the name.
+/x
+
+puts "Scanning for files in #{ROOT}"
+
+# Classify photo and film files
+
+glob = File.join(ROOT, "*.{jpg,mp4}")
+Dir.glob(glob, base: ROOT)
+
+file_list = FileList.new(glob)
+file_list.each do |file|
+  m = file.match(ANDROID_MATCH)
+  next if !m
+  destination_directory = File.join(ROOT, m[:year], m[:year] + m[:month], m[:year] + m[:month] + m[:day])
+  destination_file = m[:time] + "." + m[:extension].downcase
+  puts "#{file} -> #{File.join(destination_directory, destination_file)}"
+  mkdir_p destination_directory
+  mv file, File.join(destination_directory, destination_file)
+end

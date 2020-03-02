@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require "open3"
+
+LIST_VOLUMES = "docker volume ls --quiet"
+
+def each_line(command)
+  Open3.popen3(LIST_VOLUMES) do |stdin, stdout, stderr, wait_thr|
+    loop do
+      line = stdout.gets
+      break if !line
+      line.chomp!
+      yield line
+    end
+  end
+end
+
+# Delete volumes without a specified name
+
+each_line(LIST_VOLUMES) do |line|
+  if line.length == 64
+    `docker volume rm #{line}`
+  end
+end

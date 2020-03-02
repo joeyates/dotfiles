@@ -1,0 +1,190 @@
+#!/usr/bin/env ruby
+
+# jgy-backup-git-untracked --source ~/code --destination /media/joe/backups/tempfiles/code
+# jgy-backup-git-untracked --source ~/work --destination /media/joe/backups/tempfiles/work
+
+require "fileutils"
+require "optparse"
+
+options = {}
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: #{__FILE__} [options]"
+
+  opts.on(
+    "-d",
+    "--destination [PATH]",
+    "The path to copy temporary files to"
+  ) do |destination|
+    options[:destination] = destination
+  end
+
+  opts.on(
+    "-s",
+    "--source [PATH]",
+    "The path to copy temporary files from"
+  ) do |source|
+    options[:source] = source
+  end
+end
+
+parser.parse!
+
+if !options[:destination]
+  raise "Supply --destination PATH"
+end
+
+if !options[:source]
+  raise "Supply --source PATH"
+end
+
+DESTINATION = options[:destination]
+SOURCE = options[:source]
+
+if !File.directory?(DESTINATION)
+  raise "Destination '#{DESTINATION}' is not a directory"
+end
+
+if !File.directory?(SOURCE)
+  raise "Source '#{SOURCE}' is not a directory"
+end
+
+def git_repo?(path)
+  File.directory?(File.join(path, ".git"))
+end
+
+def directories(path)
+  Dir.entries(path).
+    filter { |p| File.directory?(File.join(path, p)) }.
+    reject { |p| p == "." || p == ".." }
+end
+
+class Untracked
+  attr_reader :path
+
+  def initialize(path:)
+    @path = path
+  end
+
+  def run
+    return [] if !git_repo?(path)
+    untracked
+  end
+
+  private
+
+  def untracked
+    lines.map { |line| line.gsub(/^Would remove /, "") }
+  end
+
+  def lines
+    raw_untracked.split("\n")
+  end
+
+  def raw_untracked
+    `(cd #{path} && git clean -nffdx)`
+  end
+end
+
+class Keep
+  BACKUP_MATCHES = [
+    %r{^config/database.yml$},
+    %r{^config/[\w\-\.]+\.secrets?\.exs},
+    %r{^config/secrets.yml$},
+    %r{^.env},
+    %r{^jgy-},
+    %r{^key_for_data_bags?$}
+  ]
+
+  attr_reader :path
+
+  def initialize(path:)
+    @path = path
+  end
+
+  def run
+    untracked = Untracked.new(path: path).run
+
+    untracked.filter do |u|
+      BACKUP_MATCHES.find { |rx| rx.match?(u) }
+    end
+  end
+
+  private
+end
+
+class Backup
+  attr_reader :source
+  attr_reader :path
+  attr_reader :files
+  attr_reader :destination
+
+  def initialize(source:, path:, files:, destination:)
+    @source = source
+    @path = path
+    @files = files
+    @destination = destination
+  end
+
+  def run
+    ensure_destination
+    copy_files
+  end
+
+  private
+
+  def ensure_destination
+    FileUtils.mkdir_p destination_path
+  end
+
+  def copy_files
+    files.map do |f|
+      from = File.join(source_path, f)
+      to = File.join(destination_path, f)
+      FileUtils.mkdir_p File.dirname(to)
+      FileUtils.cp_r from, to
+    end
+  end
+
+  def destination_path
+    File.join(destination, path)
+  end
+
+  def source_path
+    File.join(source, path)
+  end
+end
+
+def nested_git_repos(path)
+  first_level = directories(path)
+
+  paths = first_level.flat_map do |entry|
+    full_path = File.join(path, entry)
+    if git_repo?(full_path)
+      entry
+    else
+      ds = directories(full_path)
+      repos = ds.filter do |d|
+        sub_path = File.join(full_path, d)
+        git_repo?(sub_path)
+      end
+      repos.map { |r| File.join(entry, r) }
+    end
+  end.sort
+end
+
+paths = nested_git_repos(SOURCE)
+
+keeps = paths.map do |entry|
+  full_path = File.join(SOURCE, entry)
+  keep = Keep.new(path: full_path).run
+  if keep.any?
+    [entry, keep]
+  end
+end.compact
+
+keeps.each do |(path, files)|
+  Backup.new(
+    source: SOURCE, path: path, files: files, destination: DESTINATION
+  ).run
+end

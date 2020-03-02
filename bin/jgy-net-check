@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+`ping -c 1 1.1.1.1`
+
+if $?.exitstatus != 0
+  raise "Internet ping failed - no connection"
+end
+
+puts "OK!"
