@@ -6,7 +6,7 @@
 require "fileutils"
 require "optparse"
 
-options = {}
+options = {ignored: false}
 
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: #{__FILE__} [options]"
@@ -20,6 +20,14 @@ parser = OptionParser.new do |opts|
   end
 
   opts.on(
+    "-i",
+    "--ignored",
+    "List files that would **not** be backed up"
+  ) do
+    options[:ignored] = true
+  end
+
+  opts.on(
     "-s",
     "--source [PATH]",
     "The path to copy temporary files from"
@@ -30,7 +38,7 @@ end
 
 parser.parse!
 
-if !options[:destination]
+if !options[:ignored] && !options[:destination]
   raise "Supply --destination PATH"
 end
 
@@ -41,7 +49,7 @@ end
 DESTINATION = options[:destination]
 SOURCE = options[:source]
 
-if !File.directory?(DESTINATION)
+if !options[:ignored] && !File.directory?(DESTINATION)
   raise "Destination '#{DESTINATION}' is not a directory"
 end
 
@@ -55,7 +63,7 @@ end
 
 def directories(path)
   Dir.entries(path).
-    filter { |p| File.directory?(File.join(path, p)) }.
+    select { |p| File.directory?(File.join(path, p)) }.
     reject { |p| p == "." || p == ".." }
 end
 
@@ -105,12 +113,18 @@ class Keep
   def run
     untracked = Untracked.new(path: path).run
 
-    untracked.filter do |u|
-      BACKUP_MATCHES.find { |rx| rx.match?(u) }
+    untracked.select do |u|
+      BACKUP_MATCHES.any? { |rx| rx.match?(u) }
     end
   end
 
-  private
+  def ignored
+    untracked = Untracked.new(path: path).run
+
+    untracked.select do |u|
+      BACKUP_MATCHES.all? { |rx| !rx.match?(u) }
+    end
+  end
 end
 
 class Backup
@@ -164,7 +178,7 @@ def nested_git_repos(path)
       entry
     else
       ds = directories(full_path)
-      repos = ds.filter do |d|
+      repos = ds.select do |d|
         sub_path = File.join(full_path, d)
         git_repo?(sub_path)
       end
@@ -173,18 +187,39 @@ def nested_git_repos(path)
   end.sort
 end
 
-paths = nested_git_repos(SOURCE)
+def paths
+  nested_git_repos(SOURCE)
+end
 
-keeps = paths.map do |entry|
-  full_path = File.join(SOURCE, entry)
-  keep = Keep.new(path: full_path).run
-  if keep.any?
-    [entry, keep]
+def list_ignored
+  paths.each do |entry|
+    full_path = File.join(SOURCE, entry)
+    ignored = Keep.new(path: full_path).ignored
+    if ignored.any?
+      puts "#{entry}:"
+      puts "\t" + ignored.join("\n\t")
+    end
   end
-end.compact
+end
 
-keeps.each do |(path, files)|
-  Backup.new(
-    source: SOURCE, path: path, files: files, destination: DESTINATION
-  ).run
+def backup_keeps
+  keeps = paths.map do |entry|
+    full_path = File.join(SOURCE, entry)
+    keep = Keep.new(path: full_path).run
+    if keep.any?
+      [entry, keep]
+    end
+  end.compact
+
+  keeps.each do |(path, files)|
+    Backup.new(
+      source: SOURCE, path: path, files: files, destination: DESTINATION
+    ).run
+  end
+end
+
+if options[:ignored]
+  list_ignored
+else
+  backup_keeps
 end
