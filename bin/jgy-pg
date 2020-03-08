@@ -12,4 +12,5 @@ docker \
   --rm \
   --volume /tmp/docker-pg:/tmp \
   --volume $VOLUME:/var/lib/postgresql/data \
+  -e POSTGRES_HOST_AUTH_METHOD=trust \
   postgres:$PG_VERSION
