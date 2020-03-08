@@ -13,7 +13,7 @@ fi
 
 alias b=bundle
 alias c=jgy-clear-screen
-alias cl='xclip -selection clipboard'
+alias cl='perl -pi -e "chomp" | xclip -selection clipboard'
 alias cig='curl -IXGET'
 alias dw=jgy-word-diff
 alias e=jgy-edit
