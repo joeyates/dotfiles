@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-ES_VERSION=${1:-latest}
+ES_VERSION=${1:-6.8.6}
 
 docker run --publish 9200:9200 elasticsearch:$ES_VERSION
