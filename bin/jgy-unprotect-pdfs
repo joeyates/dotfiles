@@ -1,0 +1,101 @@
+#!/usr/bin/env ruby
+
+# jgy-unprotect-pdfs --source ~/Desktop/foo --destination ~/Desktop/bar
+
+require "fileutils"
+require "optparse"
+
+options = {ignored: false}
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: #{__FILE__} [options]"
+
+  opts.on(
+    "-d",
+    "--destination [PATH]",
+    "The path to copy unencrypted PDFs files to"
+  ) do |destination|
+    options[:destination] = destination
+  end
+
+  opts.on(
+    "-s",
+    "--source [PATH]",
+    "The path to copy encrypted PDF files from"
+  ) do |source|
+    options[:source] = source
+  end
+end
+
+parser.parse!
+
+if !options[:destination]
+  raise "Supply --destination PATH"
+end
+
+if !options[:source]
+  raise "Supply --source PATH"
+end
+
+PASSWORD = ENV["PASSWORD"]
+DESTINATION = options[:destination]
+SOURCE = options[:source]
+
+if !File.directory?(DESTINATION)
+  raise "Destination '#{DESTINATION}' is not a directory"
+end
+
+if !File.directory?(SOURCE)
+  raise "Source '#{SOURCE}' is not a directory"
+end
+
+class Unencrypt
+  attr_reader :source
+  attr_reader :destination
+  attr_reader :path
+
+  def initialize(source:, destination:, path:)
+    @source = source
+    @destination = destination
+    @path = path
+  end
+
+  def run
+    ensure_destination
+    unencrypt
+  end
+
+  private
+
+  def ensure_destination
+    FileUtils.mkdir_p(destination_directory)
+  end
+
+  def unencrypt
+    `qpdf --password='#{PASSWORD}' --decrypt '#{source_path}' '#{destination_path}'`
+  end
+
+  def destination_path
+    File.join(destination, path)
+  end
+
+  def destination_directory
+    File.dirname(destination_path)
+  end
+
+  def source_path
+    File.join(source, path)
+  end
+end
+
+def unprotect
+  glob = File.join("**", "*.pdf")
+  encrypted = Dir.chdir(SOURCE) { Dir.glob(glob, File::FNM_CASEFOLD) }
+  encrypted.each do |path|
+    Unencrypt.new(
+      source: SOURCE, destination: DESTINATION, path: path
+    ).run
+  end
+end
+
+unprotect
