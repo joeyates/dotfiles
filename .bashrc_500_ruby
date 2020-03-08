@@ -1,13 +1,3 @@
-# rbenv
-
-if test -f "$HOME/.rbenv/bin/rbenv" ; then
-  PATH=$PATH:$HOME/.rbenv/bin # Add rbenv to PATH
-  eval "$(rbenv init -)"
-fi
-
-# In Bundler-managed Ruby projects, give predence to bundler shimmed scripts
-export PATH=./bin/stubs:$PATH
-
 # rails
 
 function jgy-rails-migrate-test() {

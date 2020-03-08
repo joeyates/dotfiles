@@ -1,0 +1,10 @@
+# asdf
+
+if test -f "$HOME/.asdf/bin/asdf" ; then
+  . $HOME/.asdf/asdf.sh
+  . $HOME/.asdf/completions/asdf.bash
+fi
+
+# In Bundler-managed Ruby projects, give predence to bundler shimmed scripts
+export PATH=./bin/stubs:$PATH
+
