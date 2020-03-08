@@ -1,10 +1,5 @@
-# knife-bootstrap <host> <operating system>
-function knife-bootstrap() {
-  bundle exec knife bootstrap --template-file bootstrap/$2.erb -u root $1
-}
-
 function knife-create-site-cookbook() {
-  bundle exec knife cookbook create $1 -o site-cookbooks  
+  bundle exec knife cookbook create $1 -o site-cookbooks
 }
 
 function knife-create-data-bag() {
@@ -19,6 +14,7 @@ function knife-edit-data-bag() {
   bundle exec knife solo data bag edit $1 $2
 }
 
+# knife-dump-data-bag-to-json <group> <bag>
 function knife-dump-data-bag-to-json() {
   bundle exec knife solo data bag show $1 $2 -F json
 }
@@ -27,6 +23,7 @@ function knife-edit-user() {
   knife-edit-data-bag users $1
 }
 
+# knife-whyrun <host>
 function knife-whyrun() {
   bundle exec knife solo cook --no-chef-check --why-run root@$1
 }
@@ -35,6 +32,7 @@ function knife-debug-whyrun() {
   bundle exec knife solo cook -V --no-chef-check --why-run root@$1
 }
 
+# knife-deploy <host>
 function knife-deploy() {
   bundle exec knife solo cook --no-chef-check root@$1
 }
