@@ -1,4 +1,0 @@
-# Add my scripts to PATH
-export PATH=~/bin:$PATH
-
-# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles

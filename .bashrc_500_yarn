@@ -1,5 +1,0 @@
-# yarn
-
-export PATH=$PATH:/home/joe/.config/yarn/global/node_modules/.bin
-
-# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
