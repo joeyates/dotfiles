@@ -1,3 +1,7 @@
+# Run project-local scripts (low precedence)
+
+export PATH=$PATH:./bin
+
 # Add my scripts to PATH
 
 export PATH=~/bin:$PATH
