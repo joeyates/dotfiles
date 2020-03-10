@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -e
+set -u
 
 # Usage
 # reverse-tunnel <remote host> <remote port> <local port>

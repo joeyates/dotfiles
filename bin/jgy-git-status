@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -e
+set -u
 
 # This code is adapted from
 # https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/git.zsh
