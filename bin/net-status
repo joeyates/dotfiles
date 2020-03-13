@@ -1,0 +1,119 @@
+#!/usr/bin/env elixir
+
+import Enum, except: [split: 2]
+import IO, only: [puts: 1]
+import String, only: [split: 2]
+
+defmodule Network do
+  @well_known_public_ip "1.1.1.1"
+
+  def check do
+    interfaces = interface_list()
+
+    if length(interfaces) == 0 do
+      raise "[Error] No network interfaces found"
+    end
+
+    {gateway_ip, gateway_interface} = internet_gateway()
+
+    if !gateway_ip || !gateway_interface do
+      raise "[Error] No gateway found"
+    end
+
+    puts "[OK] Gateway: #{gateway_interface} #{gateway_ip}"
+
+    ping_quality = get_ping_quality(gateway_ip)
+
+    if ping_quality == 0 do
+      raise "[Error] gateway unreachable"
+    end
+
+    if ping_quality < 100 do
+      puts "[Problema] gateway connection is intermittent"
+    end
+
+    puts "[OK] Gateway accessibile"
+
+    public_ip_ping_quality = get_ping_quality(@well_known_public_ip)
+
+    if public_ip_ping_quality == 0 do
+      raise "[Error] Internet unreachable"
+    end
+
+    if public_ip_ping_quality < 100 do
+      puts "[Problem] Internet connection is intermittent"
+    end
+
+    puts "[OK] Internet accessible"
+  end
+
+  defp interface_list do
+    shell!("netstat", ["-i"])
+    |> split("\n")
+    |> map(&(Regex.run(~r/\w+/, &1)))
+    |> filter(&(&1))
+    |> map(&Kernel.hd/1)
+    |> slice(2..-1)
+  end
+
+  def list_interfaces(interfaces) do
+    puts "Network interfaces:"
+
+    real = Enum.filter(interfaces, &(&1 != "lo"))
+
+    each(real, fn interface ->
+      case interface_ip(interface) do
+        {:ok, ip} -> puts "\t#{interface}: #{ip}"
+        {:not_found, message} -> "\t#{interface}: #{message}"
+      end
+    end)
+  end
+
+  defp interface_ip(interface) do
+    ipv4 =
+      shell!("ifconfig", [interface])
+      |> split("\n")
+      |> find(&(Regex.run(~r/\s+inet\s/, &1)))
+    if ipv4 do
+      {:ok, Regex.run(~r/\d+\.\d+\.\d+\.\d+/, ipv4)}
+    else
+      {:not_found, "Not connected"}
+    end
+  end
+
+  defp internet_gateway do
+    line = shell!("netstat", ["-rn"])
+    parts =
+      Regex.run(~r/^0\.0\.0\.0.*/m, line)
+      |> hd
+      |> split(~r/\s+/)
+    {at(parts, 1), at(parts, -1)}
+  end
+
+  defp get_ping_quality(ip) do
+    packet_loss =
+      shell!("ping", ~w(-q -c 2) ++ [ip])
+      |> split("\n")
+      |> find(&(Regex.run(~r/packet loss/, &1)))
+
+    if !packet_loss do
+      raise "[Error] this ping does not respond with 'packet loss'"
+    end
+
+    case Regex.run(~r/(\d+)% packet loss/m, packet_loss) do
+      nil -> {:error, "ping format unrecognized"}
+      [_match, percentage] ->
+        {loss, _rest} = Integer.parse(percentage)
+        {:ok, 100 - loss}
+    end
+  end
+
+  defp shell!(command, args) do
+    case System.cmd(command, args) do
+      {output, 0} -> output
+      {output, errno} -> raise "The command `#{command} #{Enum.join(args, " ")}` failed with error #{errno}:\n#{output}"
+    end
+  end
+end
+
+Network.check()
