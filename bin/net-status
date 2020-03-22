@@ -29,10 +29,10 @@ defmodule Network do
     end
 
     if ping_quality < 100 do
-      puts "[Problema] gateway connection is intermittent"
+      puts "[Problem] gateway connection is intermittent"
     end
 
-    puts "[OK] Gateway accessibile"
+    puts "[OK] Gateway accessible"
 
     public_ip_ping_quality = get_ping_quality(@well_known_public_ip)
 
