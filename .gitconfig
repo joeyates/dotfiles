@@ -88,10 +88,10 @@
   #########################
   # status
   s                   = status --short
-  # dp - show plain diff
-  dp                  = diff
+  # d - show plain diff
+  d                   = diff
   dw                  = diff --word-diff
-  d                   = diff --color-words
+  dcw                 = diff --color-words
   # ds {branch}: diff stats - shows changed files and number of changes
   ds                  = diff --stat=100,100
   # di: 'diff index'
