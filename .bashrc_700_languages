@@ -5,3 +5,8 @@ if test -f "$HOME/.asdf/bin/asdf" ; then
   . $HOME/.asdf/completions/asdf.bash
 fi
 
+# Erlang
+
+## Enable shell history
+export ERL_AFLAGS="-kernel shell_history enabled"
+
