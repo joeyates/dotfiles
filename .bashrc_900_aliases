@@ -38,6 +38,7 @@ if which trash-put >/dev/null ; then
   alias t='trash-put'
 fi
 
+alias clwd='pwd | cl'
 alias r=rails
 alias rdbm='rails db:migrate'
 alias rdbmt='rails db:migrate RAILS_ENV=test'
