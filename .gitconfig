@@ -78,6 +78,7 @@
   # staging
   a                   = add --patch
   ai                  = add --interactive
+  # Add index entries for all unknown files
   an                  = add --intent-to-add .
   cm                  = commit
   cmm                 = commit -m
