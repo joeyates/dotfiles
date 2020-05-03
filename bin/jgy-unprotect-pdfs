@@ -37,6 +37,10 @@ if !options[:source]
   raise "Supply --source PATH"
 end
 
+if !ENV.key?("PASSWORD")
+  raise "Set the password via the 'PASSWORD' environment variable"
+end
+
 PASSWORD = ENV["PASSWORD"]
 DESTINATION = options[:destination]
 SOURCE = options[:source]
