@@ -45,10 +45,6 @@ PASSWORD = ENV["PASSWORD"]
 DESTINATION = options[:destination]
 SOURCE = options[:source]
 
-if !File.directory?(DESTINATION)
-  raise "Destination '#{DESTINATION}' is not a directory"
-end
-
 if !File.directory?(SOURCE)
   raise "Source '#{SOURCE}' is not a directory"
 end
