@@ -3,6 +3,10 @@ Pry.commands.alias_command '.s', 'step' unless Pry.commands['step'].nil?
 Pry.commands.alias_command '.n', 'next' unless Pry.commands['next'].nil?
 Pry.commands.alias_command '.f', 'finish' unless Pry.commands['finish'].nil?
 
-Pry.config.prompt = proc { |obj, _, _| "#{obj}> " }
+Pry::Prompt.add(:jgy, "Overridden default prompt", [">", "...>"]) do |context, _nesting, pry_instance, sep|
+  "#{context}#{sep} "
+end
+
+Pry.config.prompt = Pry::Prompt[:jgy]
 
 # vim: :set filetype=ruby :
