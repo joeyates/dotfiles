@@ -15,6 +15,8 @@ alias b=bundle
 alias c=jgy-clear-screen
 alias cl='perl -p -e "chomp" | xclip -selection clipboard'
 alias cig='curl -IXGET'
+alias dokku='ssh -t dokku@$DOKKU_HOST'
+alias dokku-root='ssh -t root@$DOKKU_HOST dokku'
 alias dotgit='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
 alias dw=jgy-word-diff
 alias e=jgy-edit
