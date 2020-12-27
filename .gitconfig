@@ -117,7 +117,7 @@
   #########################
   # rebase
   rebase-branch       = !sh -c 'git fetch && git rebase origin/master'
-  ri                  = rebase --interactive --preserve-merges
+  ri                  = rebase --interactive --rebase-merges
   rc                  = rebase --continue
   rs                  = rebase --skip
   # Create a temporary commit as an amendment to a previous commit
