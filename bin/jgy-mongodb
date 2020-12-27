@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+MONGO_DB_VERSION=${1:-3}
+VOLUME=${2:-mongo$MONGO_DB_VERSION}
+
+docker \
+  run \
+  --publish 27017:27017 \
+  --rm \
+  --volume $VOLUME:/data/db \
+  mongo:$MONGO_DB_VERSION
