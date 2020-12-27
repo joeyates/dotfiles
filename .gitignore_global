@@ -11,6 +11,7 @@
 .emacs.desktop
 .emacs.desktop.lock
 /env
+.envrc*
 erl_crash.dump
 /*.ez
 jgy-*
