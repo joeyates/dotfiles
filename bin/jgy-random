@@ -2,6 +2,19 @@
 
 require "securerandom"
 
-BYTES = ARGV[1] || 60
+DEFAULT_CHARACTERS =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+  "0123456789" +
+  "abcdefghijklmnopqrstuvwxyz" +
+  ".,;:<>[]{}()!#$%^&*-_=+'\"\\|"
 
-puts SecureRandom.alphanumeric(BYTES)
+LENGTH = ARGV.length > 0 ? ARGV[0].to_i : 60
+CHARACTERS = ARGV.length > 1 ? ARGV[1] : DEFAULT_CHARACTERS
+COUNT = CHARACTERS.length
+
+choices = 1.upto(LENGTH).map do
+  pos = SecureRandom.rand(COUNT)
+  CHARACTERS[pos]
+end
+
+puts choices.join("")

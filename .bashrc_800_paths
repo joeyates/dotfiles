@@ -6,9 +6,6 @@ export PATH=$PATH:./bin
 
 export PATH=~/bin:$PATH
 
-# nvm
-export PATH=$PATH:$NVM_BIN
-
 # Ease access to node scripts
 
 export PATH=$PATH:./node_modules/.bin
