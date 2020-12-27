@@ -42,8 +42,8 @@ if !ENV.key?("PASSWORD")
 end
 
 PASSWORD = ENV["PASSWORD"]
-DESTINATION = options[:destination]
-SOURCE = options[:source]
+DESTINATION = File.expand_path(options[:destination])
+SOURCE = File.expand_path(options[:source])
 
 if !File.directory?(SOURCE)
   raise "Source '#{SOURCE}' is not a directory"
