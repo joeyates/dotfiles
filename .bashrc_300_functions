@@ -185,7 +185,7 @@ function jgy-edit {
 function jgy-mc {
   if [[ $# -ne 1 ]]; then
     echo "Supply a directory name"
-    exit 1
+    return -1
   fi
   mkdir $1
   cd $1
