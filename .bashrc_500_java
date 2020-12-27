@@ -1,3 +1,6 @@
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export ANDROID_SDK=/home/joe/.android/sdk
+export PATH=/home/joe/.android/platform-tools:$PATH
+export PATH=/home/joe/.android/emulator:$PATH
 
 # dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
