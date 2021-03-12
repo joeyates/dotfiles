@@ -1,0 +1,67 @@
+############################################
+# prefix
+
+# C-b is not acceptable -- Vim uses it
+# I'd like to use ^Z but it backgrounds the current process
+set-option -g prefix C-j
+
+# Use Vim mode
+set-window-option -g mode-keys vi
+
+############################################
+# keyboard
+
+# List current bindings:
+# $ tmux list-keys
+
+# Acceptable values are listed in man page 'KEY BINDINGS'
+
+# prefix + prefix jumps to previous window
+bind C-j select-window -l
+# normally prefix + c creates a new window, allow lazy prefix + Ctrl+C
+bind C-c new-window
+# normally prefix + d detaches the session, allow lazy prefix + Ctrl+D
+bind C-d detach
+# prefix + <Backspace> - previous window
+bind BSpace previous-window
+# prefix + <SPC> - next window
+bind Space select-window -n
+# prefix + r = reload config
+bind r source-file ~/.tmux.conf \; display-message "Config reloaded..."
+
+# Allows for faster key repetition
+#set -s escape-time 0
+
+############################################
+# windows
+
+# Start numbering at 0
+#set -g base-index 0
+
+############################################
+# display
+
+#set -g default-terminal "xterm-24bit"
+#set -g terminal-overrides ',xterm-24bit:Tc'
+
+# Rather than constraining window size to the maximum size of any client 
+# connected to the *session*, constrain window size to the maximum size of any 
+# client connected to *that window*. Much more reasonable.
+#setw -g aggressive-resize on
+
+############################################
+# history
+
+set-option -g history-limit 10000
+
+#############################################
+# status line
+
+# Set status bar
+set -g status-bg black
+set -g status-fg white
+set -g status-left ""
+set -g status-right ""
+
+# Highlight active window
+set-window-option -g window-status-current-style bg=blue
