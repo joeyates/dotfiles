@@ -20,6 +20,7 @@ alias dokku-root='ssh -t root@$DOKKU_HOST dokku'
 alias dotgit='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
 alias dw=jgy-word-diff
 alias e=jgy-edit
+alias es='printenv | sort'
 alias en='jgy-edit-no-session'
 alias f=jgy-find-files-and-directories
 alias fd=jgy-find-directories
