@@ -8,6 +8,8 @@
   tool = opendiff
   noprefix = true
   renameLimit = 5000
+[diff "rspec"]
+  xfuncname = "^[ \t]*((before|context|describe|it|after|around|feature|scenario)[ \t]\\\".*)$"
 [log]
   noprefix = true
 [mailmap]
@@ -116,7 +118,6 @@
 
   #########################
   # rebase
-  rebase-branch       = !sh -c 'git fetch && git rebase origin/master'
   ri                  = rebase --interactive --rebase-merges
   rc                  = rebase --continue
   rs                  = rebase --skip

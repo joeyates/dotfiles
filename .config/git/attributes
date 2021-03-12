@@ -1,2 +1,4 @@
 *.ex diff=elixir
 *.exs diff=elixir
+*.rb diff=ruby
+*_spec.rb diff=rspec
