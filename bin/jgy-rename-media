@@ -1,37 +1,399 @@
 #!/usr/bin/env ruby
 
+# Classify photo and film files by moving them to directories
+# with the following naming convention:
+#    2010s/2013/201304/20130426
+# Extensions are downcased.
+# .jpeg is replaced by .jpg
+
 require "fileutils"
+require "optparse"
 require "rake"
 
-ROOT = File.expand_path(ARGV[0] || ".", Dir.pwd)
-ANDROID_MATCH = /
-  \/                # The whole file name
-  (IMG|VID)         # starts with an image or film indicator.
-  _                 # An underscore is followed by
-  (?<year>\d{4})    # year,
-  (?<month>\d{2})   # month,
-  (?<day>\d{2})     # and day.
-  _                 # Another underscore is followed by
-  (?<time>[^\.]+)   # time
-  \.
-  (?<extension>\w+) # An extension
-  $                 # completes the name.
-/x
+Pathnamer = Struct.new(:year, :month, :day, :filename) do
+  def path
+    decade = (year.to_i / 10).floor * 10
 
-puts "Scanning for files in #{ROOT}"
+    File.join(
+      "#{decade}s",
+      year,
+      year + month,
+      year + month + day,
+      filename
+    )
+  end
+end
 
-# Classify photo and film files
+class FilenameMatcher
+  def initialize(source:, pattern:)
+    @source = source
+    @pattern = pattern
+  end
 
-glob = File.join(ROOT, "*.{jpg,mp4}")
-Dir.glob(glob, base: ROOT)
+  def pathname
+    return nil if !matches?
+    return nil if !valid?
 
-file_list = FileList.new(glob)
-file_list.each do |file|
-  m = file.match(ANDROID_MATCH)
-  next if !m
-  destination_directory = File.join(ROOT, m[:year], m[:year] + m[:month], m[:year] + m[:month] + m[:day])
-  destination_file = m[:time] + "." + m[:extension].downcase
-  puts "#{file} -> #{File.join(destination_directory, destination_file)}"
-  mkdir_p destination_directory
-  mv file, File.join(destination_directory, destination_file)
+    Pathnamer.new(year, month, day, filename).path
+  end
+
+  def errors
+    @errors =
+      begin
+        return [] if !matches?
+
+        errors = []
+
+        if month.to_i < 1
+          errors << "The file '#{source}' has an incorrect month"
+        end
+
+        if month.to_i > 12
+          errors << "The file '#{source}' has an incorrect month"
+        end
+
+        errors
+      end
+  end
+
+  def matches?
+    !match.nil?
+  end
+
+  def valid?
+    errors.count.zero?
+  end
+
+  private
+
+  def match
+    @match ||= source.match(pattern)
+  end
+
+  def day
+    @day ||= if matches?
+      match[:day]
+    end
+  end
+
+  def extension
+    @extension ||= if matches?
+      extension = match[:extension].downcase
+      extension = "jpg" if extension == "jpeg"
+      extension
+    end
+  end
+
+  def filename
+    @filename ||= if matches?
+      remainder + "." + extension
+    end
+  end
+
+  def month
+    @month ||= if matches?
+      match[:month]
+    end
+  end
+
+  def pattern
+    @pattern
+  end
+
+  def remainder
+    @remainder ||= if matches?
+      match[:remainder]
+    end
+  end
+
+  def source
+    @source
+  end
+
+  def year
+    @year ||= if matches?
+      match[:year]
+    end
+  end
+end
+
+NAMING = {
+  android: {
+    name: "Android",
+    extensions: %w(jpg mp4),
+    pattern: /
+      \/                # The whole file name
+      (IMG|VID)         # starts with an image or film indicator.
+      _                 # An underscore is followed by
+      (?<year>\d{4})    # year,
+      (?<month>\d{2})   # month,
+      (?<day>\d{2})     # and day.
+      _                 # Another underscore is followed by
+      (?<remainder>[^\.]+)   # the remainder
+      \.
+      (?<extension>\w+) # An extension
+      $                 # completes the name.
+    /x
+  },
+  signal: {
+    name: "Signal",
+    extensions: %w(jpg),
+    filenamer: -> (file) {
+      basename = File.basename(file)
+      puts "basename: #{basename}"
+    }
+  },
+  whats_app: {
+    name: "WhatsApp",
+    extensions: %w(jpg jpeg),
+    pattern: /
+      \/                # The whole file name
+      (IMG)             # starts with an image indicator.
+      -                 # A hyphen is followed by
+      (?<year>\d{4})    # year,
+      (?<month>\d{2})   # month,
+      (?<day>\d{2})     # and day.
+      -                 # Another hyphen is followed by
+      (?<remainder>[^\.]+)   # the remainder
+      \.
+      (?<extension>\w+) # An extension
+      $                 # completes the name.
+    /x
+  }
+}
+
+DEFAULT_TYPES = NAMING.map { |t, _v| t.to_s }.join(",")
+
+options = {
+  dry_run: false,
+  overwrite: false,
+  types: DEFAULT_TYPES,
+  verbose: false
+}
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: #{__FILE__} [options]"
+
+  opts.on(
+    "-d",
+    "--destination [PATH]",
+    "The root path to move files to"
+  ) do |destination|
+    options[:destination] = destination
+  end
+
+  opts.on(
+    "-s",
+    "--source [PATH]",
+    "The path to move files from"
+  ) do |source|
+    options[:source] = source
+  end
+
+  opts.on(
+    "-n",
+    "--dry-run",
+    "Don't do anything"
+  ) do
+    options[:dry_run] = true
+  end
+
+  opts.on(
+    "-o",
+    "--overwrite",
+    "Overwrite existing files (default: false)"
+  ) do
+    options[:overwrite] = true
+  end
+
+  opts.on(
+    "-t [TYPES]",
+    "--types [TYPES]",
+    "Which file types to process (default: #{DEFAULT_TYPES})"
+  ) do |types|
+    options[:types] = types
+  end
+
+  opts.on(
+    "-v",
+    "--verbose",
+    "Give lots of output"
+  ) do
+    options[:verbose] = true
+  end
+end
+
+parser.parse!
+
+raise "Supply --destination PATH" if !options[:destination]
+raise "Supply --source PATH" if !options[:source]
+
+source = File.expand_path(options[:source])
+destination = File.expand_path(options[:destination])
+
+dry_run = options[:dry_run]
+overwrite = options[:overwrite]
+types = options[:types].split(",").map(&:intern)
+verbose = options[:verbose]
+
+if !File.directory?(source)
+  raise "The source directory '#{source}' does not exist"
+end
+
+if !File.directory?(destination)
+  puts "Creating destination directory '#{destination}'" if verbose
+  FileUtils.mkdir_p destination if !dry_run
+end
+
+class Renamer
+  def initialize(type:, source:, destination:, verbose: false, dry_run: false, overwrite: false)
+    @type = type
+    @source = source
+    @destination = destination
+    @verbose = destination
+    @dry_run = dry_run
+    @overwrite = overwrite
+  end
+
+  def run
+    log "Scanning for #{name} files in '#{source}'"
+
+    file_list = FileList.new(glob)
+
+    file_list.each do |file|
+      process_file file
+    end
+  end
+
+  private
+
+  def process_file(pathname)
+    log "Processing file '#{pathname}'"
+
+    destination_pathname = case
+    when filenamer
+      pathname_from_filenamer(pathname, filenamer)
+    when pattern
+      pathname_from_pattern(pathname, pattern)
+    else
+      log("No namer for '#{type}'")
+      return
+    end
+
+    if !destination_pathname
+      log("Skipping file '#{pathname}'")
+      return
+    end
+
+    if File.exist?(destination_pathname)
+      if overwrite
+        FileUtils.rm destination_pathname
+      else
+        message = <<~MESSAGE
+        Not moving file '#{pathname}' as a file already exists
+        at '#{destination_pathname}'.
+        Specify `--overwrite` to force replacement.
+      MESSAGE
+        log message
+        return
+      end
+    end
+
+    destination_directory = File.dirname(destination_pathname)
+
+    if !File.directory?(destination_directory)
+      log "Creating subdirectory '#{destination_directory}'"
+      FileUtils.mkdir_p destination_directory if !dry_run
+    end
+
+    log "Moving '#{pathname}' to '#{destination_pathname}'"
+
+    FileUtils.mv pathname, destination_pathname if !dry_run
+  end
+
+  def pathname_from_filenamer(source, filenamer)
+    filenamer.call(source)
+  end
+
+  def pathname_from_pattern(source, pattern)
+    namer = FilenameMatcher.new(source: source, pattern: pattern)
+    if !namer.matches?
+      log "File name '#{source}' does not match the required pattern"
+      return nil
+    end
+
+    if !namer.valid?
+      log "The file name '#{source}' has the following errors: \n" + namer.errors.join("\n")
+      return nil
+    end
+
+    File.join(destination, namer.pathname)
+  end
+
+  def glob
+    @glob ||= File.join(source, %Q(*.{#{extensions.join(",")}}))
+  end
+
+  def config
+    @config =
+      begin
+        config = NAMING[@type]
+        raise "Unknown type '#{@type}'" if !config
+        config
+      end
+  end
+
+  def name
+    config[:name]
+  end
+
+  def extensions
+    config[:extensions]
+  end
+
+  def filenamer
+    config[:filenamer]
+  end
+
+  def pattern
+    config[:pattern]
+  end
+
+  def destination
+    @destination
+  end
+
+  def dry_run
+    @dry_run
+  end
+
+  def overwrite
+    @overwrite
+  end
+
+  def source
+    @source
+  end
+
+  def verbose
+    @verbose
+  end
+
+  def log(message)
+    return if !verbose
+
+    puts message
+  end
+end
+
+types.each do |type|
+  renamer = Renamer.new(
+    type: type,
+    source: source,
+    destination: destination,
+    verbose: verbose,
+    dry_run: dry_run,
+    overwrite: overwrite
+  )
+  renamer.run
 end
