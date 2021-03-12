@@ -3,7 +3,9 @@
 require "fileutils"
 require "optparse"
 
-options = {}
+options = {
+  verbose: 0
+}
 
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: #{__FILE__} [options]"
@@ -15,6 +17,14 @@ parser = OptionParser.new do |opts|
   ) do |value|
     options[:path] = value
   end
+
+  opts.on(
+    "-v",
+    "--verbose",
+    "Give lots of output"
+  ) do
+    options[:verbose] += 1
+  end
 end
 
 parser.parse!
@@ -24,6 +34,7 @@ if !options[:path]
 end
 
 path = options[:path]
+VERBOSE = options[:verbose]
 
 if !File.directory?(path)
   raise "Directory '#{path}' does not exist"
@@ -57,23 +68,27 @@ def nested_git_repos(path)
   end.sort
 end
 
-def uncommitted?(path)
+def uncommitted(path)
   u = `(cd #{path} && git status --short)`
-  u != ""
+  u == "" ? nil : u
 end
 
-def unpushed?(path)
+def unpushed(path)
   u = `(cd #{path} && git log --branches --not --remotes --format=oneline)`
-  u != ""
+  u == "" ? nil : u
 end
 
 paths = nested_git_repos(path)
 
 paths.each do |p|
   full_path = File.join(path, p)
-  untracked = uncommitted?(full_path)
-  unpushed = unpushed?(full_path)
+  untracked = uncommitted(full_path)
+  unpushed = unpushed(full_path)
   if untracked || unpushed
     puts full_path
+    if VERBOSE
+      puts untracked if untracked
+      puts unpushed if unpushed
+    end
   end
 end
