@@ -25,7 +25,9 @@ alias en='jgy-edit-no-session'
 alias f=jgy-find-files-and-directories
 alias fd=jgy-find-directories
 alias ff=jgy-find-files
-alias fo=jgy-find-open-first
+if type -t jgy-find-open > /dev/null ; then
+  alias fo=jgy-find-open
+fi
 alias g='git'
 alias h='history'
 alias less='less -R'

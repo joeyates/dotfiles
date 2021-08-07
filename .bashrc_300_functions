@@ -49,13 +49,31 @@ function jgy-find-files-and-directories() {
 
 unset _exclude_matches _excludes _match
 
-function jgy-find-open-first() {
-  local first=$(jgy-find-files $* | head --lines=1)
-  if [ "x${first}x" == "xx" ]; then
-    return -1
-  fi
-  jgy-edit $first
-}
+if which fzf >/dev/null ; then
+  # find files matching the input parameters
+  # if there's only one result, open it
+  # if there are no results, exit with non-zero
+  # otherwise, present a menu
+  # open the file that is chosen
+  # if Ctrl+C is pressed, exit with non-zero
+  function jgy-find-open() {
+    local matches=$(jgy-find-files-and-directories "$@")
+    if [ "x${matches}x" == "xx" ]; then
+      return -1
+    else
+      local count=$(echo "$matches" | wc -l)
+      if [[ $count -eq 1 ]]; then
+        jgy-edit $matches
+      else
+        local choice=$(echo "$matches" | fzf)
+        if [ "x${choice}x" == "xx" ]; then
+          return -1
+        fi
+        jgy-edit $choice
+      fi
+    fi
+  }
+fi
 
 function jgy-timestamp {
   date +%Y%m%d%H%M%S
