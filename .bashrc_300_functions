@@ -99,19 +99,19 @@ function jgy-file-as-json-string() {
 
 if which ag >/dev/null ; then
   function jgy-grep() {
-    ag --case-sensitive $*
+    ag --case-sensitive "$@"
   }
 
   function jgy-grep-case-insensitive() {
-    ag --ignore-case $*
+    ag --ignore-case "$@"
   }
 
   function jgy-grep-word() {
-    ag --word-regexp --case-sensitive $*
+    ag --word-regexp --case-sensitive "$@"
   }
 
   function jgy-grep-word-case-insensitive() {
-    ag --word-regexp --ignore-case $*
+    ag --word-regexp --ignore-case "$@"
   }
 else
   echo "ag is not installed"
