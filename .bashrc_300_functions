@@ -125,11 +125,12 @@ function jgy-ssh-keygen() {
   BYTES=${BYTES:-4096}
   COMMENT=${COMMENT:-RSA key}
   NAME=${NAME:-id_rsa}
-  ssh-keygen -t rsa -b $BYTES -N "" -C "$COMMENT" -f "$NAME"
+  ALGORITHM=${ALGORITHM:-ed25519}
+  ssh-keygen -t $ALGORITHM -b $BYTES -N "" -C "$COMMENT" -f "$NAME"
 }
 
 function jgy-ssh-keygen-usage() {
-  echo "Usage: [BYTES=2048|4096*] [COMMENT=""] [NAME=FILE_NAME] jgy-ssh-keygen";
+  echo "Usage: [BYTES=2048|4096*] [COMMENT=""] [NAME=FILE_NAME] [ALGORITHM=ed25519*|rsa] jgy-ssh-keygen";
 }
 
 ##########################################
