@@ -97,51 +97,7 @@ function jgy-file-as-json-string() {
   ruby -e "puts File.read('$1').inspect"
 }
 
-if which ack-grep >/dev/null ; then
-  function jgy-grep() {
-    ack-grep $*
-  }
-
-  function jgy-grep-case-insensitive() {
-    ack-grep -i $*
-  }
-
-  function jgy-grep-word() {
-    local pattern=$1
-    shift
-    ack-grep "\b$pattern\b" $*
-  }
-
-  function jgy-grep-word-case-insensitive() {
-    local pattern=$1
-    shift
-    ack-grep -i "\b$pattern\b" $*
-  }
-elif which ack >/dev/null ; then
-  function jgy-grep() {
-    local pattern=$1
-    shift
-    ack "$pattern" $*
-  }
-
-  function jgy-grep-case-insensitive() {
-    local pattern=$1
-    shift
-    ack -i "$pattern" $*
-  }
-
-  function jgy-grep-word() {
-    local pattern=$1
-    shift
-    ack "\b$pattern\b" $*
-  }
-
-  function jgy-grep-word-case-insensitive() {
-    local pattern=$1
-    shift
-    ack -i "\b$pattern\b" $*
-  }
-elif which ag >/dev/null ; then
+if which ag >/dev/null ; then
   function jgy-grep() {
     ag --case-sensitive $*
   }
@@ -158,7 +114,7 @@ elif which ag >/dev/null ; then
     ag --word-regexp --ignore-case $*
   }
 else
-  echo "No ack-type program installed"
+  echo "ag is not installed"
 fi
 
 function jgy-ssh-keygen() {
