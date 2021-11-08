@@ -1,3 +1,8 @@
+# terminal type
+
+# macOS: iTerm2 and tmux work best with xterm-color
+export TERM=xterm-color
+
 # history
 HISTCONTROL=ignoredups:ignorespace
 shopt -s histappend
@@ -20,7 +25,7 @@ export LESS="--no-init --RAW-CONTROL-CHARS --quit-if-one-screen"
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # Collect directory stats for z
-. /home/joe/bin/z
+. /opt/homebrew/etc/profile.d/z.sh
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
