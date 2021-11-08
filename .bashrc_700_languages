@@ -1,12 +1,17 @@
 # asdf
 
-if test -f "$HOME/.asdf/bin/asdf" ; then
-  . $HOME/.asdf/asdf.sh
-  . $HOME/.asdf/completions/asdf.bash
+jgy-debug "Checking for asdf..."
+if which asdf >/dev/null ; then
+  jgy-debug "asdf found"
+  export ASDF_DIR=$(readlink -f $(brew --prefix asdf))/libexec
+  . $ASDF_DIR/asdf.sh
+  # macOS:
+  . /opt/homebrew/etc/bash_completion.d/asdf.bash
+else
+  echo "No asdf found in PATH!" 1>&2
 fi
 
 # Erlang
 
 ## Enable shell history
 export ERL_AFLAGS="-kernel shell_history enabled"
-
