@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-tmux attach -t rails || tmux new-session -s rails \; source-file ~/.tmux/rails-session.conf \; attach
+session=jgy-tmux
+tmux attach -t $session || tmux new-session -s $session \; source-file ~/.tmux/jgy-session.conf \; attach
