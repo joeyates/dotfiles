@@ -16,8 +16,8 @@ alias c=jgy-clear-screen
 alias ck='jgy-clear-screen 1000'
 alias cl='perl -p -e "chomp" | xclip -selection clipboard'
 alias cig='curl -IXGET'
-alias dokku='ssh -t dokku@$DOKKU_HOST 2>/dev/null'
-alias dokku-root='ssh -t root@$DOKKU_HOST dokku'
+alias dokku=jgy-dokku
+alias dokku-root='ssh -o LogLevel=QUIET -t root@$DOKKU_HOST dokku'
 alias dotgit='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
 alias dw=jgy-word-diff
 alias e=jgy-edit

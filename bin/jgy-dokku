@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -o errtrace
+set -o nounset
+set -o pipefail
+
+DOKKU_HOST=${DOKKU_HOST:-""}
+
+if [[ -z "${DOKKU_HOST}" ]]; then
+  echo "$0: Please set DOKKU_HOST to the host name of your Dokku host" >&2
+  exit 1
+fi
+
+ssh -t dokku@$DOKKU_HOST "$@" 2>&1 | grep -v "Connection to $DOKKU_HOST closed."
