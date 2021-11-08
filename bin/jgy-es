@@ -3,3 +3,6 @@
 ES_VERSION=${1:-6.8.6}
 
 docker run --publish 9200:9200 elasticsearch:$ES_VERSION
+
+# Run a deprecated version:
+# docker run --publish 9200:9200 docker.elastic.co/elasticsearch/elasticsearch:2.4.6
