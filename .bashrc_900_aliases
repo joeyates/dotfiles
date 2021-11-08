@@ -48,6 +48,8 @@ fi
 
 if which trash-put >/dev/null ; then
   alias t='trash-put'
+elif which trash >/dev/null ; then
+  alias t='trash'
 fi
 
 alias clwd='pwd | cl'
