@@ -92,7 +92,8 @@
   # status
   s                   = status --short
   # d - show plain diff
-  d                   = diff --function-context
+  d                   = diff
+  df                  = diff --function-context
   dw                  = diff --word-diff
   dcw                 = diff --color-words
   # ds {branch}: diff stats - shows changed files and number of changes
