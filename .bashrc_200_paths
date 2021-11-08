@@ -12,7 +12,7 @@ export PATH=$PATH:./node_modules/.bin
 
 # yarn
 
-export PATH=$PATH:/home/joe/.config/yarn/global/node_modules/.bin
+export PATH=$PATH:$HOME/.config/yarn/global/node_modules/.bin
 
 # In Bundler-managed Ruby projects, give predence to bundler shimmed scripts
 
