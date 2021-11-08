@@ -89,6 +89,15 @@ function jgy-clear-screen() {
   done
 }
 
+function macos-trash() {
+  if [[ $# -ne 1 ]]; then
+    echo "Supply a file/directory name" >&2
+    return -1
+  fi
+  local filename=$1
+  osascript -e "tell application \"Finder\" to delete POSIX file \"${PWD}/${filename}\""
+}
+
 function jgy-word-diff() {
   wdiff $1 $2 | colordiff
 }
