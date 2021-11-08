@@ -8,7 +8,7 @@ require "optparse"
 options = {ignored: false}
 
 parser = OptionParser.new do |opts|
-  opts.banner = "Usage: #{__FILE__} [options]"
+  opts.banner = "Usage: PASSWORD=[password] #{__FILE__} [options]"
 
   opts.on(
     "-d",
