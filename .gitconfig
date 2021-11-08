@@ -96,10 +96,10 @@
   df                  = diff --function-context
   dw                  = diff --word-diff
   dcw                 = diff --color-words
-  # ds {branch}: diff stats - shows changed files and number of changes
-  ds                  = diff --stat=100,100
-  # di: 'diff index'
-  di                  = diff --cached
+  # dstat {branch}: diff stats - shows changed files and number of changes
+  dstat               = diff --stat=100,100
+  # ds: 'diff staged'
+  ds                  = diff --cached
   # untracked: list all untracked files and directories
   untracked           = "!f() {\
                            local path=${1:-.}; \
