@@ -10,8 +10,8 @@ set -euxo pipefail
 PG_VERSION=${1:-12}
 VOLUME=${2:-postgis$PG_VERSION}
 EXTERNAL_PORT=${3:-5432}
-#IMAGE=kartoza/postgis:12.0
-IMAGE=mdillon/postgis:$PG_VERSION
+
+IMAGE=postgis/postgis:$PG_VERSION
 
 mkdir -p /tmp/docker-pg
 chmod 0777 /tmp/docker-pg
@@ -21,5 +21,5 @@ docker \
   --publish $EXTERNAL_PORT:5432 \
   --volume /tmp/docker-pg:/tmp \
   --volume $VOLUME:/var/lib/postgresql/data \
-  -e POSTGRES_PASS=password \
+  -e POSTGRES_HOST_AUTH_METHOD=trust \
   $IMAGE
