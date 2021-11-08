@@ -57,6 +57,7 @@
   co                  = checkout
   p                   = pull
   ps                  = push
+  pf                  = push --force-with-lease
   fp                  = fetch --all --prune
 
   #########################
