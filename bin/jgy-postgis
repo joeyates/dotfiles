@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PG_VERSION=${1:-11}
+PG_VERSION=${1:-12}
 VOLUME=${2:-postgis$PG_VERSION}
 EXTERNAL_PORT=${3:-5432}
 #IMAGE=kartoza/postgis:12.0
