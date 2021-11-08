@@ -40,6 +40,11 @@ alias lh='ls -lhA'
 alias ltr='ls -lAtr'
 alias mc=jgy-mc
 alias p=jgy-password
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  alias psafux='ps afuxww'
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  alias psafux='pstree'
+fi
 
 if which trash-put >/dev/null ; then
   alias t='trash-put'
