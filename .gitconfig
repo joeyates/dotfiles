@@ -148,3 +148,5 @@
   #refresh-interval = 1
 
 # vim: :set filetype=gitconfig :
+[init]
+	defaultBranch = main
