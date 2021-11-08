@@ -5,6 +5,8 @@
 # Images on Docker Hub:
 # https://hub.docker.com/r/postgis/postgis
 
+set -euxo pipefail
+
 PG_VERSION=${1:-12}
 VOLUME=${2:-postgis$PG_VERSION}
 EXTERNAL_PORT=${3:-5432}
