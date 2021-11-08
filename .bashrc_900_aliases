@@ -39,7 +39,7 @@ alias la='ls -lA'
 alias lh='ls -lhA'
 alias ltr='ls -lAtr'
 alias mc=jgy-mc
-alias p=pass
+alias p=jgy-password
 
 if which trash-put >/dev/null ; then
   alias t='trash-put'
