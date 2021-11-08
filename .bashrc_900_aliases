@@ -13,6 +13,7 @@ fi
 
 alias b=bundle
 alias c=jgy-clear-screen
+alias ck='jgy-clear-screen 1000'
 alias cl='perl -p -e "chomp" | xclip -selection clipboard'
 alias cig='curl -IXGET'
 alias dokku='ssh -t dokku@$DOKKU_HOST 2>/dev/null'
