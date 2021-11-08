@@ -18,12 +18,4 @@ export PATH=$PATH:$HOME/.config/yarn/global/node_modules/.bin
 
 export PATH=./bin/stubs:$PATH
 
-# Dedupe PATH...
-# 1. split into lines at ':'
-# 2. skip duplicates
-# 3. join back into a single line with ':' separators
-# 4. chop off the extra ':' from the end
-#                    1                      2               3             4
-export PATH=`tr ':' '\n' <<< $PATH | awk '!a[$0]++' | tr '\n' ':' | sed 's/.$//'`
-
 # dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
