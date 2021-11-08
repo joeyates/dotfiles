@@ -9,7 +9,4 @@ end
 
 Pry.config.prompt = Pry::Prompt[:jgy]
 
-# Load plugin options:
-Pry.plugins.values.each(&:load_cli_options)
-
 # vim: :set filetype=ruby :
