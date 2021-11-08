@@ -22,5 +22,4 @@ jgy-*
 /.rubocop-http*
 .session.vim
 *.swp
-TAGS
 yarn-error.log
