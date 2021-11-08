@@ -9,8 +9,8 @@ ssl_csr=/tmp/server.req
 ssl_initial_key=/tmp/privkey.pem
 ssl_key=/tmp/server.key
 ssl_cert=/tmp/server.crt
-debian_postgres_uid=999
-debian_postgres_gid=999
+debian_postgres_uid=joe
+debian_postgres_gid=wheel
 temporary_password=mysecret
 
 if [ ! -f "$ssl_key" ]
