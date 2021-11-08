@@ -29,6 +29,7 @@ alias ff=jgy-find-files
 if type -t jgy-find-open > /dev/null ; then
   alias fo=jgy-find-open
 fi
+alias .g=dotgit
 alias g='git'
 alias h='history'
 alias less='less -R'
