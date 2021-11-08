@@ -161,7 +161,8 @@ function jgy-edit {
       # stop emacs searching in parent directories
       touch .emacs.desktop
     fi
-    TERM=xterm-24bits emacs $*
+    # linux: TERM=xterm-24bits emacs $*
+    emacs $*
   fi
 }
 
