@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Project repo:
+# https://github.com/postgis/docker-postgis
+# Images on Docker Hub:
+# https://hub.docker.com/r/postgis/postgis
+
 PG_VERSION=${1:-12}
 VOLUME=${2:-postgis$PG_VERSION}
 EXTERNAL_PORT=${3:-5432}
