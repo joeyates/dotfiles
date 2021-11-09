@@ -6,10 +6,21 @@
 require "fileutils"
 require "optparse"
 
-options = {ignored: false}
+options = {
+  delete: false,
+  ignored: false
+}
 
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: #{__FILE__} [options]"
+
+  opts.on(
+    "-D",
+    "--delete",
+    "Delete files as they are backed up"
+  ) do |_|
+    options[:delete] = true
+  end
 
   opts.on(
     "-d",
@@ -46,6 +57,7 @@ if !options[:source]
   raise "Supply --source PATH"
 end
 
+DELETE = !!options[:delete]
 DESTINATION = options[:destination]
 SOURCE = options[:source]
 
@@ -215,6 +227,12 @@ def backup_keeps
     Backup.new(
       source: SOURCE, path: path, files: files, destination: DESTINATION
     ).run
+    if DELETE
+      files.each do |f|
+        pathname = File.join(SOURCE, path, f)
+        File.unlink pathname
+      end
+    end
   end
 end
 
