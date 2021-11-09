@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+HOST=${1:-}
+PORT=${2:-443}
+
+if [ "x$HOST" == "x" ]
+then
+  >&2 echo "Supply a hostname"
+  exit 1
+fi
+
+nmap --script ssl-enum-ciphers -p $PORT $HOST
