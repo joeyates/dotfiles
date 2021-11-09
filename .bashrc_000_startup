@@ -1,0 +1,10 @@
+# export JGY_BASHRC_DEBUG=1
+
+function jgy-debug {
+  if [[ $# -lt 1 ]] ; then
+    return 1
+  fi
+  if [[ -n "${JGY_BASHRC_DEBUG}"  ]] ; then
+    echo "$1"
+  fi
+}
