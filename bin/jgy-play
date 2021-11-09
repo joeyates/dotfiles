@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+type=${1:-help};
+
+function usage() (
+  echo "'f' for films and 'm' for music"
+)
+
+case $type in
+  help)
+    usage;
+    exit 0;
+    ;;
+  f|film|F|Film)
+    directory=Films;
+    ;;
+  m|music|M|Music)
+    directory=Music;
+    ;;
+  *)
+    usage;
+    exit 1;
+    ;;
+esac
+
+/Applications/VLC.app/Contents/MacOS/VLC --playlist-tree --start-paused sftp://pi@raspberrypi.local:/media/files/$directory/
