@@ -1,0 +1,6 @@
+PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# macOS: use brew-installed commands without a g-prefix
+PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH"
+
