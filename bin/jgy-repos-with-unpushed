@@ -82,8 +82,8 @@ def list_non_repo_content(path)
   paths = nested_git_repos(path)
   first_levels = directories(path)
   first_levels_with_content = paths.map { |p| File.dirname(p) }.uniq
-  found += (first_levels - first_levels_with_content).
-    map { |p| File.join(path, p) }
+  first_levels_without_content = first_levels - first_levels_with_content
+  found += first_levels_without_content.map { |p| File.join(path, p) }
 
   first_levels_with_content.each do |first|
     first_path = File.join(path, first)
