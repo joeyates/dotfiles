@@ -1,73 +1,23 @@
 #!/usr/bin/env ruby
 
-# jgy-backup-git-untracked --source ~/code --destination /media/joe/backups/tempfiles/code
-# jgy-backup-git-untracked --source ~/work --destination /media/joe/backups/tempfiles/work
+# jgy-backup-git-untracked ~/code /media/joe/backups/tempfiles/code
+# jgy-backup-git-untracked ~/work /media/joe/backups/tempfiles/work
 
-require "fileutils"
-require "optparse"
+require "bundler/inline"
 
-options = {
-  delete: false,
-  ignored: false
-}
-
-parser = OptionParser.new do |opts|
-  opts.banner = "Usage: #{__FILE__} [options]"
-
-  opts.on(
-    "-D",
-    "--delete",
-    "Delete files as they are backed up"
-  ) do |_|
-    options[:delete] = true
-  end
-
-  opts.on(
-    "-d",
-    "--destination [PATH]",
-    "The path to copy temporary files to"
-  ) do |destination|
-    options[:destination] = destination
-  end
-
-  opts.on(
-    "-i",
-    "--ignored",
-    "List files that would **not** be backed up"
-  ) do
-    options[:ignored] = true
-  end
-
-  opts.on(
-    "-s",
-    "--source [PATH]",
-    "The path to copy temporary files from"
-  ) do |source|
-    options[:source] = source
-  end
+gemfile do
+  source "https://rubygems.org"
+  gem "thor"
 end
 
-parser.parse!
-
-if !options[:ignored] && !options[:destination]
-  raise "Supply --destination PATH"
-end
-
-if !options[:source]
-  raise "Supply --source PATH"
-end
-
-DELETE = !!options[:delete]
-DESTINATION = options[:destination]
-SOURCE = options[:source]
-
-if !options[:ignored] && !File.directory?(DESTINATION)
-  raise "Destination '#{DESTINATION}' is not a directory"
-end
-
-if !File.directory?(SOURCE)
-  raise "Source '#{SOURCE}' is not a directory"
-end
+BACKUP_MATCHES = [
+  %r{^config/database.yml$},
+  %r{^config/[\w\-\.]+\.secrets?\.exs},
+  %r{^config/secrets.yml$},
+  %r{^.env},
+  %r{^jgy-},
+  %r{^key_for_data_bags?$}
+]
 
 def git_repo?(path)
   File.directory?(File.join(path, ".git"))
@@ -107,15 +57,6 @@ class Untracked
 end
 
 class Keep
-  BACKUP_MATCHES = [
-    %r{^config/database.yml$},
-    %r{^config/[\w\-\.]+\.secrets?\.exs},
-    %r{^config/secrets.yml$},
-    %r{^.env},
-    %r{^jgy-},
-    %r{^key_for_data_bags?$}
-  ]
-
   attr_reader :path
 
   def initialize(path:)
@@ -199,45 +140,89 @@ def nested_git_repos(path)
   end.sort
 end
 
-def paths
-  nested_git_repos(SOURCE)
-end
+class CLI < Thor
+  class Ignored < Thor
+    include Thor::Actions
 
-def list_ignored
-  paths.each do |entry|
-    full_path = File.join(SOURCE, entry)
-    ignored = Keep.new(path: full_path).ignored
-    if ignored.any?
-      puts "#{entry}:"
-      puts "\t" + ignored.join("\n\t")
+    desc "list SOURCE", "List ignored files"
+    def list(source)
+      paths = nested_git_repos(source)
+      paths.each do |entry|
+        full_path = File.join(source, entry)
+        ignored = Keep.new(path: full_path).ignored
+        if ignored.any?
+          puts "#{entry}:"
+          puts "\t" + ignored.join("\n\t")
+        end
+      end
     end
-  end
-end
 
-def backup_keeps
-  keeps = paths.map do |entry|
-    full_path = File.join(SOURCE, entry)
-    keep = Keep.new(path: full_path).run
-    if keep.any?
-      [entry, keep]
-    end
-  end.compact
-
-  keeps.each do |(path, files)|
-    Backup.new(
-      source: SOURCE, path: path, files: files, destination: DESTINATION
-    ).run
-    if DELETE
-      files.each do |f|
-        pathname = File.join(SOURCE, path, f)
-        File.unlink pathname
+    desc "delete", "Delete ignored files"
+    def delete(source)
+      paths = nested_git_repos(source)
+      paths.each do |entry|
+        full_path = File.join(source, entry)
+        ignored = Keep.new(path: full_path).ignored
+        ignored.each do |p|
+          pathname = File.join(full_path, p)
+          FileUtils.rm_rf pathname
+        end
       end
     end
   end
+
+  class Useful < Thor
+    include Thor::Actions
+
+    desc "backup SOURCE DESTINATION [OPTIONS]", "Backup useful files"
+    option :delete
+    def backup(source, destination)
+      delete = options.key?(:delete)
+
+      keeps(source).each do |(path, files)|
+        Backup.new(
+          source: source, path: path, files: files, destination: destination
+        ).run
+        if delete
+          files.each do |f|
+            pathname = File.join(source, path, f)
+            File.unlink pathname
+          end
+        end
+      end
+    end
+
+    desc "list SOURCE", "List useful files"
+    def list(source)
+      keeps(source).each do |(path, files)|
+        puts "#{path}:"
+        puts files.join("\n")
+      end
+    end
+
+    no_commands do
+      def keeps(source)
+        paths = nested_git_repos(source)
+        keeps = paths.map do |entry|
+          full_path = File.join(source, entry)
+          keep = Keep.new(path: full_path).run
+          if keep.any?
+            [entry, keep]
+          end
+        end.compact
+      end
+    end
+  end
+
+  def self.exit_on_failure?
+    true
+  end
+
+  desc "ignored SUBCOMMAND [OPTIONS]", "Manage ignored files"
+  subcommand "ignored", Ignored
+
+  desc "useful SUBCOMMAND [OPTIONS]", "Manage useful files"
+  subcommand "useful", Useful
 end
 
-if options[:ignored]
-  list_ignored
-else
-  backup_keeps
-end
+CLI.start(ARGV)
