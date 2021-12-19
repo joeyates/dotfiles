@@ -1,5 +1,11 @@
 #!/usr/bin/env ruby
 
+# List stuff that needs to be cleaned up before deleting a set of
+# directories containg Git repos.
+
+# This script assumes that repos are checked out as USERNAME/REPO,
+# i.e. torvalds/linux
+
 require "fileutils"
 require "optparse"
 
@@ -44,6 +50,11 @@ def git_repo?(path)
   File.directory?(File.join(path, ".git"))
 end
 
+def files(path)
+  Dir.entries(path).
+    filter { |p| File.file?(File.join(path, p)) }
+end
+
 def directories(path)
   Dir.entries(path).
     filter { |p| File.directory?(File.join(path, p)) }.
@@ -55,17 +66,31 @@ def nested_git_repos(path)
 
   paths = first_level.flat_map do |entry|
     full_path = File.join(path, entry)
-    if git_repo?(full_path)
-      entry
-    else
-      ds = directories(full_path)
-      repos = ds.filter do |d|
-        sub_path = File.join(full_path, d)
-        git_repo?(sub_path)
-      end
-      repos.map { |r| File.join(entry, r) }
+    ds = directories(full_path)
+    repos = ds.filter do |d|
+      sub_path = File.join(full_path, d)
+      git_repo?(sub_path)
     end
+    repos.map { |r| File.join(entry, r) }
   end.sort
+end
+
+# List first-level files and directories that are not Git repos
+def list_non_repo_content(path)
+  found = []
+
+  paths = nested_git_repos(path)
+  first_levels = directories(path)
+  first_levels_with_content = paths.map { |p| File.dirname(p) }.uniq
+  found += (first_levels - first_levels_with_content).
+    map { |p| File.join(path, p) }
+
+  first_levels_with_content.each do |first|
+    first_path = File.join(path, first)
+    found += files(first_path).map { |p| File.join(first_path, p) }
+  end
+
+  found
 end
 
 def uncommitted(path)
@@ -73,22 +98,117 @@ def uncommitted(path)
   u == "" ? nil : u
 end
 
+def list_uncommitted(path)
+  found = []
+
+  paths = nested_git_repos(path)
+  paths.map do |repo|
+    repo_path = File.join(path, repo)
+    u = uncommitted(repo_path)
+    if u
+      <<~MESSAGE
+        #{repo_path}:
+        #{u}
+      MESSAGE
+    end
+  end.compact
+end
+
+def repo_stashed(path)
+  u = `(cd #{path} && git stash list)`
+  u == "" ? nil : u
+end
+
+def list_stashed(path)
+  found = []
+
+  paths = nested_git_repos(path)
+  paths.map do |repo|
+    repo_path = File.join(path, repo)
+    u = repo_stashed(repo_path)
+    if u
+      <<~MESSAGE
+        #{repo_path}:
+        #{u}
+      MESSAGE
+    end
+  end.compact
+end
+
+def repo_ignored(path)
+  u = `(cd #{path} && git clean -nffdx)`
+  u.gsub!("Would remove ", "")
+  u == "" ? nil : u
+end
+
+def list_ignored(path)
+  found = []
+
+  paths = nested_git_repos(path)
+  paths.map do |repo|
+    repo_path = File.join(path, repo)
+    u = repo_ignored(repo_path)
+    if u
+      <<~MESSAGE
+        #{repo_path}:
+        #{u}
+      MESSAGE
+    end
+  end.compact
+end
+
 def unpushed(path)
   u = `(cd #{path} && git log --branches --not --remotes --format=oneline)`
   u == "" ? nil : u
 end
 
-paths = nested_git_repos(path)
+def list_unpushed(path)
+  found = []
 
-paths.each do |p|
-  full_path = File.join(path, p)
-  untracked = uncommitted(full_path)
-  unpushed = unpushed(full_path)
-  if untracked || unpushed
-    puts full_path
-    if VERBOSE
-      puts untracked if untracked
-      puts unpushed if unpushed
+  paths = nested_git_repos(path)
+  paths.map do |repo|
+    repo_path = File.join(path, repo)
+    u = unpushed(repo_path)
+    if u
+      <<~MESSAGE
+        #{repo_path}:
+        #{u}
+      MESSAGE
     end
-  end
+  end.compact
+end
+
+non_repo_content = list_non_repo_content(path)
+if non_repo_content.any?
+  puts "Found non repo content:"
+  non_repo_content.map { |p| puts p }
+  exit 1
+end
+
+uncommitted_paths = list_uncommitted(path)
+if uncommitted_paths.any?
+  puts "Found uncommitted content:"
+  uncommitted_paths.map { |p| puts p }
+  exit 1
+end
+
+stashed = list_stashed(path)
+if stashed.any?
+  puts "Found stashed content:"
+  stashed.map { |p| puts p }
+  exit 1
+end
+
+ignored_paths = list_ignored(path)
+if ignored_paths.any?
+  puts "Found ignored content:"
+  ignored_paths.map { |p| puts p }
+  exit 1
+end
+
+unpushed_paths = list_unpushed(path)
+if unpushed_paths.any?
+  puts "Found unpushed commits:"
+  unpushed_paths.map { |p| puts p }
+  exit 1
 end
