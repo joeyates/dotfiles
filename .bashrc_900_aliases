@@ -19,6 +19,7 @@ alias cig='curl -IXGET'
 alias dokku=jgy-dokku
 alias dokku-root='ssh -o LogLevel=QUIET -t root@$DOKKU_HOST dokku'
 alias dotgit='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
+alias dottig='GIT_DIR=$HOME/.dotfiles GIT_WORK_TREE=$HOME tig --all'
 alias dw=jgy-word-diff
 alias e=jgy-edit
 alias es='printenv | sort'
@@ -59,6 +60,7 @@ alias rdbmt='rails db:migrate RAILS_ENV=test'
 alias rpc='pry -r ./config/environment'
 alias rs='rails server -b 0.0.0.0'
 alias rspf='rspec --only-failures'
+alias .t=dottig
 alias ta='tmux attach'
 alias tg='tig `git rev-parse --abbrev-ref HEAD`'
 alias tga='tig --all'
