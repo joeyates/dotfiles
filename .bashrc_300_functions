@@ -176,6 +176,18 @@ function jgy-mc {
   cd $1
 }
 
+jgy-password() (
+  selected=$(jgy-password-select "$@")
+  [[ -z "$selected" ]] && exit 1
+  pass $selected
+)
+
+jgy-password-edit() (
+  selected=$(jgy-password-select "$@")
+  [[ -z "$selected" ]] && exit 1
+  pass edit $selected
+)
+
 # Local Variables:
 # mode: sh
 # End:

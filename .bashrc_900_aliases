@@ -41,6 +41,7 @@ alias lh='ls -lhA'
 alias ltr='ls -lAtr'
 alias mc=jgy-mc
 alias p=jgy-password
+alias pe=jgy-password-edit
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   alias psafux='ps afuxww'
 elif [[ "$OSTYPE" == "darwin"* ]]; then
