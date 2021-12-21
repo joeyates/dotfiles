@@ -7,7 +7,7 @@ set -o pipefail
 type=${1:-help};
 
 function usage() (
-  echo "'f' for films and 'm' for music"
+  echo "'f' for films, 'm' for music or 't' for TV"
 )
 
 case $type in
@@ -20,6 +20,9 @@ case $type in
     ;;
   m|music|M|Music)
     directory=Music;
+    ;;
+  t|tv|T|TV)
+    directory=TV;
     ;;
   *)
     usage;
