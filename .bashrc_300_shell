@@ -27,7 +27,7 @@ export LESS="--no-init --RAW-CONTROL-CHARS --quit-if-one-screen"
 # Collect directory stats for z
 case "$OSTYPE" in
   "darwin"*)
-    . /opt/homebrew/etc/profile.d/z.sh
+    . $(brew --prefix)/etc/profile.d/z.sh
     ;;
   "linux"*)
     . "$HOME/bin/z"

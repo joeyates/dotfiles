@@ -12,7 +12,7 @@ jgy-asdf-macos() {
     jgy-debug "asdf found"
     export ASDF_DIR=$(readlink -f $(brew --prefix asdf))/libexec
     . $ASDF_DIR/asdf.sh
-    . /opt/homebrew/etc/bash_completion.d/asdf.bash
+    . $(brew --prefix)/etc/bash_completion.d/asdf.bash
   else
     echo "No asdf found in PATH!" 1>&2
   fi

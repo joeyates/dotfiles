@@ -2,9 +2,11 @@
 
 jgy-debug "Setting up brew"
 
-PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
-eval "$(/opt/homebrew/bin/brew shellenv)"
+_brew_path=/usr/local/bin/brew
+eval "$($_brew_path shellenv)"
 
-# macOS: use brew-installed commands without a g-prefix
+# use brew-installed commands without a g-prefix
 PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH"
+PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH"
+PATH="$(brew --prefix)/opt/sed/libexec/gnubin:$PATH"
 
