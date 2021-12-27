@@ -8,5 +8,5 @@ eval "$($_brew_path shellenv)"
 # use brew-installed commands without a g-prefix
 PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH"
 PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH"
-PATH="$(brew --prefix)/opt/sed/libexec/gnubin:$PATH"
+PATH="$(brew --prefix)/opt/gsed/libexec/gnubin:$PATH"
 
