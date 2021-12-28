@@ -64,7 +64,7 @@
   # branches
   b                   = branch
   # create a local branch that tracks a remote branch
-  bt                  = checkout --track
+  bt                  = !sh -c 'git checkout --track -b $0 origin/$0 && git pull'
   # create a new branch
   bc                  = checkout -b
   # create a 'feature/' branch
