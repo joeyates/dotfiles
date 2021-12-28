@@ -43,8 +43,12 @@ defmodule Dokku do
   end
 
   def letsencrypt(app) do
-    {_output, exit} = run("letsencrypt #{app}")
-    exit == 0
+    {output, exit} = run("letsencrypt #{app}")
+    if exit == 0 do
+      {:ok}
+    else
+      {:error, output, exit}
+    end
   end
 end
 
@@ -70,17 +74,21 @@ Dokku.set_config(dokku_app, "DOKKU_LETSENCRYPT_EMAIL", "admin@#{app_tld}")
 
 IO.puts "Attempting to obtain a staging certificate"
 Dokku.set_config(dokku_app, "DOKKU_LETSENCRYPT_SERVER", "staging")
-staging_ok = Dokku.letsencrypt(dokku_app)
-if !staging_ok do
-  raise "Failed to obtain staging certificate"
+case Dokku.letsencrypt(dokku_app) do
+  {:error, output, exit} ->
+    raise "Failed to obtain staging certificate, exit code #{exit}: #{output}"
+  _ ->
+    nil
 end
 IO.puts "Obtained staging certificate"
 Dokku.unset_config(dokku_app, "DOKKU_LETSENCRYPT_SERVER")
 
 IO.puts "Attempting to obtain a real certificate"
-production_ok = Dokku.letsencrypt(dokku_app)
-if !production_ok do
-  raise "Failed to obtain certificate"
+case Dokku.letsencrypt(dokku_app) do
+  {:error, output, exit} ->
+    raise "Failed to obtain certificate, exit code #{exit}: #{output}"
+  _ ->
+    nil
 end
 
 IO.puts "Obtained and installed Let's Encrypt certificate"
