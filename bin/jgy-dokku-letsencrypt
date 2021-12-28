@@ -1,0 +1,86 @@
+#!/usr/bin/env elixir
+
+System.fetch_env!("DOKKU_HOST")
+app_domain = System.fetch_env!("APP_DOMAIN")
+app_tld = System.fetch_env!("APP_TLD")
+dokku_app = System.fetch_env!("DOKKU_APP")
+
+defmodule Dokku do
+  def run(command) do
+    {output, exit} = System.shell("ssh -tt dokku@$DOKKU_HOST #{command} 2>&1")
+    clean = String.replace(output, ~r/Connection to [\w\.]+ closed\.\n?/, "")
+    {clean, exit}
+  end
+
+  def exists?(app) do
+    {_output, exit} = run("apps:exists #{app}")
+    exit == 0
+  end
+
+  def running?(app) do
+    {output, _exit} = run("ps:report #{app}")
+    [_match, is_running] = Regex.run(~r/Running:\s+(\w+)/, output)
+    is_running == "true"
+  end
+
+  def set_config(app, key, value, opts \\ []) do
+    restart = opts[:restart]
+    do_resart = if restart, do: "", else: "--no-restart "
+    command = "config:set #{do_resart} #{app} #{key}=#{value}"
+    run(command)
+  end
+
+  def unset_config(app, key, opts \\ []) do
+    restart = opts[:restart]
+    do_resart = if restart, do: "", else: "--no-restart "
+    command = "config:unset #{do_resart} #{app} #{key}"
+    run(command)
+  end
+
+  def certs_generate(app, domain) do
+    command = ~s(echo -e ".\n.\n.\n#{domain}\n\n\n\n\n\n" | ssh -tt dokku@$DOKKU_HOST certs:generate #{app} #{domain} 2>&1)
+    System.shell(command)
+  end
+
+  def letsencrypt(app) do
+    {_output, exit} = run("letsencrypt #{app}")
+    exit == 0
+  end
+end
+
+IO.puts "Checking the Dokku app exists"
+exists = Dokku.exists?(dokku_app)
+if !exists do
+  raise "The dokku app '#{dokku_app}' does not exist"
+end
+
+IO.puts "Checking the Dokku app is running"
+running = Dokku.running?(dokku_app)
+if !running do
+  raise "The dokku app '#{dokku_app}' is not running"
+end
+
+IO.puts "Setting domain to #{app_domain}"
+Dokku.run("domains:set #{dokku_app} #{app_domain}")
+
+# This will fail (quietly) if a self-signed certs has already been created
+{_output, _exit} = Dokku.certs_generate(dokku_app, app_domain)
+
+Dokku.set_config(dokku_app, "DOKKU_LETSENCRYPT_EMAIL", "admin@#{app_tld}")
+
+IO.puts "Attempting to obtain a staging certificate"
+Dokku.set_config(dokku_app, "DOKKU_LETSENCRYPT_SERVER", "staging")
+staging_ok = Dokku.letsencrypt(dokku_app)
+if !staging_ok do
+  raise "Failed to obtain staging certificate"
+end
+IO.puts "Obtained staging certificate"
+Dokku.unset_config(dokku_app, "DOKKU_LETSENCRYPT_SERVER")
+
+IO.puts "Attempting to obtain a real certificate"
+production_ok = Dokku.letsencrypt(dokku_app)
+if !production_ok do
+  raise "Failed to obtain certificate"
+end
+
+IO.puts "Obtained and installed Let's Encrypt certificate"
