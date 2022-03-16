@@ -12,7 +12,7 @@ function jgy-function-exists() {
 # usage:
 #   f filename_fragment [path]
 # skips git directories and python compiled files
-_exclude_matches=( '_build' 'bundle' 'deps' 'dist' '.git' 'node_modules' '*.pyc' 'rel' );
+_exclude_matches=( 'berks-cookbooks' '_build' 'bundle' 'deps' 'dist' '.git' 'node_modules' '*.pyc' 'rel' );
 _excludes=''
 for _match in ${_exclude_matches[@]}; do
   _excludes="$_excludes -name '$_match' -prune -o "
