@@ -3,20 +3,22 @@ function knife-create-site-cookbook() {
 }
 
 function knife-create-data-bag() {
-  bundle exec knife solo data bag create $1 $2
+  bundle exec knife data bag create $1 $2 --encrypt
 }
 
 function knife-create-data-bag-from-json() {
-  bundle exec knife solo data bag create $1 $2 --json-file $3
+  echo "TODO!"
+  exit 1
+  # bundle exec knife data bag from file $1
 }
 
 function knife-edit-data-bag() {
-  bundle exec knife solo data bag edit $1 $2
+  bundle exec knife data bag edit $1 $2
 }
 
-# knife-dump-data-bag-to-json <group> <bag>
+# knife-dump-data-bag-to-json BAG ITEM
 function knife-dump-data-bag-to-json() {
-  bundle exec knife solo data bag show $1 $2 -F json
+  bundle exec knife data bag show $1 $2  --format json
 }
 
 function knife-edit-user() {
