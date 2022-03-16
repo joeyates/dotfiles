@@ -1,0 +1,155 @@
+#!/usr/bin/env elixir
+
+{options, _rest} = OptionParser.parse!(
+  System.argv(),
+  strict: [host: :string, path: :string, source: :string]
+)
+
+defmodule Conversions do
+  def i(string) do
+    {integer, _remainder} = Integer.parse(string)
+    integer
+  end
+
+  def atomify(nil), do: nil
+
+  def atomify(map) do
+    Enum.into(map, %{}, fn {k, v} -> {String.to_atom(k), v} end)
+  end
+end
+
+defmodule Ls do
+  import Conversions, only: [i: 1]
+
+  def parse(output) do
+    output
+    |> String.split("\n")
+    |> Enum.map(&(String.split(&1, ~r/\s+/)))
+    |> Enum.filter(&is_file?/1)
+    |> Enum.map(&to_file/1)
+  end
+
+  defp is_file?(parts) do
+    if length(parts) == 9 do
+      String.starts_with?(hd(parts), "-")
+    else
+      false
+    end
+  end
+
+  defp to_file(parts) do
+    [_perms, _hard_links, _user, _group, size, _month, _day, _time_or_year, name] =
+      parts
+    %{size: i(size), name: name}
+  end
+end
+
+defmodule Local do
+  def files(path) do
+    {output, 0} = System.cmd("ls", ["-l", path])
+    Ls.parse(output)
+  end
+end
+
+defmodule Remote do
+  def files(%{host: host, path: path}) do
+    case System.cmd("ssh", [host, "ls", "-l", path, "2>/dev/null"]) do
+      {output, 0} ->
+        Ls.parse(output)
+      _ ->
+        []
+    end
+  end
+
+  def upload(%{local: local, host: host, remote: remote_pathname}) do
+    remote_path = Path.dirname(remote_pathname)
+    {_output, 0} = System.cmd("ssh", [host, "mkdir", "-p", remote_path])
+    {_output, 0} = System.cmd("scp", [local, "#{host}:#{remote_path}/"])
+  end
+end
+
+defmodule Media do
+  import Conversions, only: [atomify: 1, i: 1]
+
+  @android_media_file ~r[^(IMG|VID)_(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})_\d{6}\.(jpe?g|mp4)]i
+  @signal_media_file ~r[^signal-(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})]
+  @whatsapp_media_file ~r[^(IMG|VID)-(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})-WA\d{4}\.(jpg|mp4)]i
+
+  def is_media?(name) do
+    String.ends_with?(name, ".jpg") ||
+      String.ends_with?(name, ".mp4")
+  end
+
+  def date_path(name) do
+    date_path_from_regex(name, @android_media_file) ||
+      date_path_from_regex(name, @signal_media_file) ||
+      date_path_from_regex(name, @whatsapp_media_file)
+  end
+
+  defp date_path_from_regex(name, regex) do
+    match = Regex.named_captures(regex, name) |> atomify()
+    if match do
+      month_part = "#{match.year}#{match.month}"
+      day_part = "#{month_part}#{match.day}"
+      Path.join([
+        decade(i(match.year)),
+        match.year,
+        month_part,
+        day_part
+      ])
+    end
+  end
+
+  defp decade(year) do
+    d = floor(year / 10) * 10
+    "#{d}s"
+  end
+end
+
+local_files = Local.files(options[:source])
+
+Enum.reduce(
+  local_files,
+  %{},
+  fn file, listing_cache ->
+    if Media.is_media?(file.name) do
+      IO.write "'#{file.name}' "
+      local_pathname = Path.join(options[:source], file.name)
+      date_path = Media.date_path(file.name)
+      if date_path do
+        remote_directory = Path.join(options[:path], date_path)
+        remote_pathname = Path.join(remote_directory, file.name)
+        done_pathname = "#{local_pathname}.done"
+
+        listing_cache = if listing_cache[remote_directory] do
+          listing_cache
+        else
+          remote_files = Remote.files(%{host: options[:host], path: remote_directory})
+          Map.put(listing_cache, remote_directory, remote_files)
+        end
+
+        remote_files = listing_cache[remote_directory]
+        same_size = Enum.find(remote_files, fn %{size: size} -> size == file.size end)
+        if same_size do
+          if same_size.name == file.name do
+            IO.puts "already present in '#{remote_directory}'"
+            File.rename(local_pathname, done_pathname)
+          else
+            same_size_pathname = Path.join(remote_directory, same_size.name)
+            IO.puts "seems to be '#{same_size_pathname}'"
+          end
+        else
+          IO.puts "uploading to '#{remote_directory}'..."
+          Remote.upload(%{local: local_pathname, host: options[:host], remote: remote_pathname})
+          File.rename(local_pathname, done_pathname)
+        end
+        listing_cache
+      else
+        IO.puts "filename doesn't indicate date"
+        listing_cache
+      end
+    else
+      listing_cache
+    end
+  end
+)
