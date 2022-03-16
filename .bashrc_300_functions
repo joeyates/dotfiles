@@ -43,7 +43,7 @@ function jgy-find-files-and-directories() {
   find \$2 \
     $_excludes \
     -ipath \"*\$1*\"    \
-    -print | sort;
+    -print 2>/dev/null | sort;
 }
 "
 
