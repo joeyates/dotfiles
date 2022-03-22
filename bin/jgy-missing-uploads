@@ -71,7 +71,7 @@ end
 defmodule Media do
   import Conversions, only: [atomify: 1, i: 1]
 
-  @android_media_file ~r[^(IMG|VID)_(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})_\d{6}(_\d+)?\.(jpe?g|mp4)]i
+  @android_media_file ~r[^(IMG_|VID_)?(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})_\d{6}(_\d+)?\.(jpe?g|mp4)]i
   @signal_media_file ~r[^signal-(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})]
   @whatsapp_media_file ~r[^(IMG|VID)-(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})-WA\d{4}\.(jpg|mp4)]i
 
