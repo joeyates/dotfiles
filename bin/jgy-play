@@ -6,7 +6,20 @@ set -o pipefail
 
 type=${1:-help};
 
-function usage() (
+case $OSTYPE in
+  linux-gnu*)
+    application=vlc
+    ;;
+  darwin*)
+    application=/Applications/VLC.app/Contents/MacOS/VLC
+    ;;
+  *)
+    echo "Unknown operating system $OSTYPE"
+    exit 1
+    ;;
+esac
+
+usage() (
   echo "'f' for films, 'm' for music or 't' for TV"
 )
 
@@ -30,4 +43,4 @@ case $type in
     ;;
 esac
 
-/Applications/VLC.app/Contents/MacOS/VLC --playlist-tree --start-paused sftp://pi@raspberrypi.local:/media/files/$directory/
+$application --playlist-tree --start-paused sftp://pi@raspberrypi.local:/media/files/$directory/
