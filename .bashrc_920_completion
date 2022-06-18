@@ -14,7 +14,7 @@ fi
 
 if jgy-alias-exists g ;
 then
-  _xfunc git __git_complete g _git
+  _xfunc git __git_complete g __git_main
 fi
 
 # pass password manager
