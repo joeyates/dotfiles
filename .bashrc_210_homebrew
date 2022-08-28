@@ -2,7 +2,7 @@
 
 jgy-debug "Setting up brew"
 
-_brew_path=/usr/local/bin/brew
+_brew_path=/opt/homebrew/bin/brew
 eval "$($_brew_path shellenv)"
 
 # use brew-installed commands without a g-prefix
