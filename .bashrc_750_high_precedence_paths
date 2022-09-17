@@ -1,0 +1,15 @@
+# Add my scripts to PATH
+
+export PATH=~/bin:$PATH
+
+# Ease access to node scripts
+
+export PATH=$PATH:./node_modules/.bin
+
+# yarn
+
+export PATH=$PATH:$HOME/.config/yarn/global/node_modules/.bin
+
+# In Bundler-managed Ruby projects, give predence to bundler shimmed scripts
+
+export PATH=./bin/stubs:$PATH
