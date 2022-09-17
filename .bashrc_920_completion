@@ -19,11 +19,11 @@ fi
 
 # pass password manager
 
-pass_completion_path=~/opt/password-store/src/completion/pass.bash-completion
+pass_completion_path=/usr/share/bash-completion/completions/pass
 
 if [ -f $pass_completion_path ] ;
 then
-  . ~/opt/password-store/src/completion/pass.bash-completion
+  . $pass_completion_path
   if jgy-alias-exists p ;
   then
     complete -o filenames -F _pass p
