@@ -1,3 +1,28 @@
 export PASSWORD_STORE_ENABLE_EXTENSIONS=true
 
+jgy-password() (
+  selected=$(jgy-password-select "$@")
+  [[ -z "$selected" ]] && exit 1
+  pass $selected
+)
+
+jgy-title-and-password() (
+  selected=$(jgy-password-select "$@")
+  [[ -z "$selected" ]] && exit 1
+  echo $selected
+  pass $selected
+)
+
+jgy-password-edit() (
+  selected=$(jgy-password-select "$@")
+  [[ -z "$selected" ]] && exit 1
+  pass edit $selected
+)
+
+jgy-password-find() (
+  selected=$(jgy-password-select "$@")
+  [[ -z "$selected" ]] && exit 1
+  echo $selected
+)
+
 # dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
