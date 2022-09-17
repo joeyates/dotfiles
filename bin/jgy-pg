@@ -33,7 +33,7 @@ fi
 mkdir -p /tmp/docker-pg
 chmod 0777 /tmp/docker-pg
 
-docker \
+podman \
   run \
   --publish 5432:5432 \
   --rm \
