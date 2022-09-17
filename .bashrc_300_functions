@@ -1,6 +1,10 @@
 #############################
 # bash scripting related
 
+function jgy-alias-exists() {
+  alias $1 2>/dev/null >/dev/null
+}
+
 function jgy-function-exists() {
   type -t $1 >/dev/null
 }
