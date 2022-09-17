@@ -14,8 +14,10 @@ fi
 alias b=bundle
 alias c=jgy-clear-screen
 alias ck='jgy-clear-screen 1000'
-alias cl='perl -p -e "chomp" | xclip -selection clipboard'
 alias cig='curl -IXGET'
+alias cl='perl -p -e "chomp" | xclip -selection clipboard'
+# Copy the current path to the clipboard
+alias clwd='pwd | cl'
 alias dokku=jgy-dokku
 alias dokku-root='ssh -o LogLevel=QUIET -t root@$DOKKU_HOST dokku'
 alias dotgit='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
@@ -57,7 +59,6 @@ elif which trash >/dev/null ; then
   alias t='trash'
 fi
 
-alias clwd='pwd | cl'
 alias .t=dottig
 alias ta='tmux attach'
 alias tg='tig `git rev-parse --abbrev-ref HEAD`'
