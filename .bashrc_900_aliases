@@ -34,6 +34,7 @@ if type -t jgy-find-open > /dev/null ; then
 fi
 alias .g=dotgit
 alias g='git'
+alias ge='jgy-git-edit-file'
 alias h='history'
 alias less='less -R'
 alias l='ls -lF'

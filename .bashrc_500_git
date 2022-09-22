@@ -1,0 +1,20 @@
+jgy-git-find-file() (
+  if ! [[ -d ".git" ]]; then
+    jgy-die "The currect directory does not contain a Git repository";
+  fi
+  jgy-require "fzf"
+
+  git ls-files | fzf
+)
+
+jgy-git-edit-file() (
+  choice=$(jgy-git-find-file);
+  [[ -z "$choice" ]] && exit 1;
+  jgy-edit $choice;
+)
+
+# Local Variables:
+# mode: sh
+# End:
+
+# vim: set filetype=sh :
