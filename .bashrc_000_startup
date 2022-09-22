@@ -8,3 +8,25 @@ function jgy-debug {
     echo $@
   fi
 }
+
+jgy-die() {
+  echo "$@" >&2
+  exit 1
+}
+
+jgy-command-exists() (
+  command -v $1 >/dev/null
+  echo $?
+)
+
+jgy-require() {
+  if [[ $(jgy-command-exists "$@") -ne 0 ]]; then
+    jgy-die "command '$@' does not exist";
+  fi
+}
+
+# Local Variables:
+# mode: sh
+# End:
+
+# vim: set filetype=sh :
