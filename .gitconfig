@@ -5,7 +5,6 @@
 [push]
   default = current
 [diff]
-  tool = opendiff
   noprefix = true
   renameLimit = 5000
 [diff "rspec"]
