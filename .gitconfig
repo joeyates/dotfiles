@@ -18,6 +18,8 @@
   tool = meld
 [show]
   noprefix = true
+[blame]
+  ignoreRevsFile = .git-blame-ignore-revs
 [user]
   name = Joe Yates
   email = joe.g.yates@gmail.com
