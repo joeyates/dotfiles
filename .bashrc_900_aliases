@@ -18,6 +18,8 @@ alias cig='curl -IXGET'
 alias cl='perl -p -e "chomp" | xclip -selection clipboard'
 # Copy the current path to the clipboard
 alias clwd='pwd | cl'
+alias d=jgy-dokku
+alias da=jgy-dokku-app
 alias dokku=jgy-dokku
 alias dokku-root='ssh -o LogLevel=QUIET -t root@$DOKKU_HOST dokku'
 alias dotgit='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
