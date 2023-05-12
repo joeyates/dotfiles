@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+path=${1:?Please supply a file name}
+
+unzip $path
+
+echo -n "{}" > media
+
+zip with-media.colpkg collection.anki2 media

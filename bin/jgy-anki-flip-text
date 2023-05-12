@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+input=${1:?Please supply a file name}
+
+awk '{ print $2 "\t" $1 }' $input
