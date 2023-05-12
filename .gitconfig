@@ -20,6 +20,9 @@
   noprefix = true
 [blame]
   ignoreRevsFile = .git-blame-ignore-revs
+[interactive]
+  # avoid pressing return in 'git add --patch' - requires Perl Term::ReadKey
+  singleKey = true
 [user]
   name = Joe Yates
   email = joe.g.yates@gmail.com
