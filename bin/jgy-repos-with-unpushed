@@ -199,16 +199,16 @@ if stashed.any?
   exit 1
 end
 
-ignored_paths = list_ignored(path)
-if ignored_paths.any?
-  puts "Found ignored content:"
-  ignored_paths.map { |p| puts p }
-  exit 1
-end
-
 unpushed_paths = list_unpushed(path)
 if unpushed_paths.any?
   puts "Found unpushed commits:"
   unpushed_paths.map { |p| puts p }
+  exit 1
+end
+
+ignored_paths = list_ignored(path)
+if ignored_paths.any?
+  puts "Found ignored content:"
+  ignored_paths.map { |p| puts p }
   exit 1
 end
