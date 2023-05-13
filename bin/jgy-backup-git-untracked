@@ -4,6 +4,7 @@
 # jgy-backup-git-untracked ~/work /media/joe/backups/tempfiles/work
 
 require "bundler/inline"
+require "fileutils"
 
 gemfile do
   source "https://rubygems.org"
