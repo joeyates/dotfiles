@@ -50,6 +50,12 @@ def git_repo?(path)
   File.directory?(File.join(path, ".git"))
 end
 
+def has_origin_remote?(path)
+  Dir.chdir(path) do
+    `git remote 2>/dev/null`.split("\n").include?("origin")
+  end
+end
+
 def files(path)
   Dir.entries(path).
     filter { |p| File.file?(File.join(path, p)) }
@@ -95,6 +101,13 @@ def list_non_repo_content(path)
   end
 
   found
+end
+
+def list_repos_without_origin(path)
+  paths = nested_git_repos(path)
+  paths.filter do |p|
+    !has_origin_remote?(File.join(path, p))
+  end
 end
 
 def uncommitted(path)
@@ -186,6 +199,13 @@ non_repo_content = list_non_repo_content(path)
 if non_repo_content.any?
   puts "Found non repo content:"
   non_repo_content.map { |p| puts p }
+  exit 1
+end
+
+repos_without_origin = list_repos_without_origin(path)
+if repos_without_origin.any?
+  puts "Found repos without origin:"
+  repos_without_origin.map { |p| puts p }
   exit 1
 end
 
