@@ -116,8 +116,6 @@ def uncommitted(path)
 end
 
 def list_uncommitted(path)
-  found = []
-
   paths = nested_git_repos(path)
   paths.map do |repo|
     repo_path = File.join(path, repo)
@@ -137,8 +135,6 @@ def repo_stashed(path)
 end
 
 def list_stashed(path)
-  found = []
-
   paths = nested_git_repos(path)
   paths.map do |repo|
     repo_path = File.join(path, repo)
@@ -159,8 +155,6 @@ def repo_ignored(path)
 end
 
 def list_ignored(path)
-  found = []
-
   paths = nested_git_repos(path)
   paths.map do |repo|
     repo_path = File.join(path, repo)
@@ -180,8 +174,6 @@ def unpushed(path)
 end
 
 def list_unpushed(path)
-  found = []
-
   paths = nested_git_repos(path)
   paths.map do |repo|
     repo_path = File.join(path, repo)
