@@ -58,7 +58,8 @@ end
 def directories(path)
   Dir.entries(path).
     filter { |p| File.directory?(File.join(path, p)) }.
-    reject { |p| p == "." || p == ".." }
+    reject { |p| p == "." || p == ".." }.
+    sort
 end
 
 def nested_git_repos(path)
