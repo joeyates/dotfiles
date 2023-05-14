@@ -89,6 +89,9 @@ def list_non_repo_content(path)
   first_levels_with_content.each do |first|
     first_path = File.join(path, first)
     found += files(first_path).map { |p| File.join(first_path, p) }
+
+    ds = directories(first_path).map { |p| File.join(first_path, p) }
+    found += ds.filter { |p| !git_repo?(p) }
   end
 
   found
