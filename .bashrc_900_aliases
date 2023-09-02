@@ -25,7 +25,7 @@ alias dokku-root='ssh -o LogLevel=QUIET -t root@$DOKKU_HOST dokku'
 alias dotgit='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
 alias dottig='GIT_DIR=$HOME/.dotfiles GIT_WORK_TREE=$HOME tig --all'
 alias dw=jgy-word-diff
-alias e=nvr
+alias e='nvr -s'
 alias es='printenv | sort'
 alias f=jgy-find-files-and-directories
 alias fd=jgy-find-directories
