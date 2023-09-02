@@ -18,8 +18,7 @@ shopt -s checkwinsize
 # Include the current directory in **/* glob expansions
 shopt -s globstar
 
-# Doesn't load previous sessions
-export EDITOR=jgy-edit-no-session
+export EDITOR=nvim
 
 export LESS="--no-init --RAW-CONTROL-CHARS --quit-if-one-screen"
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
