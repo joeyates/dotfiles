@@ -147,27 +147,10 @@ function jgy-ssh-keygen-usage() {
 }
 
 ##########################################
-# emacs
-
-function jgy-is-emacs-running {
-  pgrep -x emacs >/dev/null
-}
+# editor
 
 function jgy-edit {
-  if jgy-is-emacs-running
-  then
-    # running - use emacsclient
-    emacsclient --alternate-editor="" --no-wait "$@"
-  else
-    # not running - use emacs"
-    if [ ! -f ".emacs.desktop" ]; then
-      # If there is no saved session,
-      # stop emacs searching in parent directories
-      touch .emacs.desktop
-    fi
-    # linux: TERM=xterm-24bits emacs $*
-    emacs "$@"
-  fi
+  nvr "$@"
 }
 
 # Create a directory and `cd` into it
