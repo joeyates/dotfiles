@@ -20,6 +20,6 @@ jgy-*
 .python_history
 .rake-builder
 /.rubocop-http*
-.session.vim
+.session.nvim
 *.swp
 yarn-error.log
