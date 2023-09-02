@@ -8,4 +8,4 @@ set -o pipefail
 DOKKU_COMMAND=${1:?"Please supply a command"}
 shift
 
-jgy-dokku $DOKKU_COMMAND $DOKKU_APP "$0"
+jgy-dokku $DOKKU_COMMAND $DOKKU_APP "$@"
