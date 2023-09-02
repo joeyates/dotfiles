@@ -2,6 +2,10 @@
   excludesfile = "~/.gitignore_global"
 [init]
   defaultBranch = main
+# Fix installation problems when using the plug plugin manager in Neovim
+# https://stackoverflow.com/questions/22147574/github-fatal-could-not-read-username-for-https-github-com-no-such-file-o/55656224#55656224
+[url "git@github.com:"]
+  insteadOf = https://github.com/
 [pull]
   rebase = true
 [push]
