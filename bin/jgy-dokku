@@ -11,4 +11,4 @@ if [[ -z "${DOKKU_HOST}" ]]; then
   exit 1
 fi
 
-ssh -t dokku@$DOKKU_HOST "$@" 2>&1 | grep -v "Connection to $DOKKU_HOST closed."
+ssh -t dokku@$DOKKU_HOST "$@"
