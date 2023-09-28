@@ -1,0 +1,41 @@
+__direnv_print_error() (
+  local RED="\e[1;31m"
+  local DEFAULT="\e[0m"
+  echo -e "${RED}$1${DEFAULT}"
+)
+
+all_exports() (
+  # Find lines with exports of environment variables,
+  # collect the names of the environment variables.
+  # To get exported environment variables as an array
+  # do this:
+  #     local exports=($(all_exports))
+  grep -Po '(?<=^export )[A-Z0-9_]+(?==)' .envrc
+)
+
+# Ensure that all exports from .envrc are documented
+# This stems from the pattern where .envrc lists all
+# environment variables *required* by a project,
+# while .envrc.private (which is excluded from source control)
+# supplies the values.
+# A comment should be as follows:
+# '# VARIABLE: documentation'
+ensure_all_documented() (
+  local exports=($(all_exports))
+  for (( i=0; i<${#exports[@]}; i++ ))
+  do
+    local export=${exports[$i]}
+    grep -P "^# $export\b" .envrc >/dev/null || __direnv_print_error "direnv: export $export does not have a comment"
+  done
+)
+
+ensure_all_set() (
+  local exports=($(all_exports))
+  for (( i=0; i<${#exports[@]}; i++ ))
+  do
+    local export=${exports[$i]}
+    if [ -z ${!export} ]; then
+      __direnv_print_error "direnv: export $export is unset"
+    fi
+  done
+)
