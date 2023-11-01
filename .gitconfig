@@ -24,8 +24,6 @@
   tool = meld
 [show]
   noprefix = true
-[blame]
-  ignoreRevsFile = .git-blame-ignore-revs
 [interactive]
   # avoid pressing return in 'git add --patch' - requires Perl Term::ReadKey
   singleKey = true
