@@ -15,6 +15,7 @@ alias b=bundle
 alias c=jgy-clear-screen
 alias ck='jgy-clear-screen 1000'
 alias cig='curl -IXGET'
+# Chop any trailing newline off stdin and set clipboard
 alias cl='perl -p -e "chomp" | xclip -selection clipboard'
 # Copy the current path to the clipboard
 alias clwd='pwd | cl'
