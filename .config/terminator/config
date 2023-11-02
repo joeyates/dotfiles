@@ -40,7 +40,7 @@
 [plugins]
 [profiles]
   [[default]]
-    background_color = "#232326"
+    background_color = "#0a1629"
     cursor_blink = False
     cursor_color = "#eee8d5"
     cursor_color_fg = False
