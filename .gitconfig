@@ -138,11 +138,6 @@
   # mf: 'merge feature', creating a merge commit
   mf                  = merge --no-ff --no-edit
 
-  #########################
-  # the stash
-  # $ git stash-diff <INDEX>
-  stash-diff          = !sh -c 'git stash show stash@{$0} --patience'
-
 [github]
   user = joeyates
 
