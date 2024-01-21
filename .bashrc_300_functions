@@ -122,20 +122,21 @@ function jgy-file-as-json-string() {
 }
 
 if which ag >/dev/null ; then
+  AG="ag --path-to-ignore $HOME/.config/ag/ignore"
   function jgy-grep() {
-    ag --case-sensitive "$@"
+    $AG --case-sensitive "$@"
   }
 
   function jgy-grep-case-insensitive() {
-    ag --ignore-case "$@"
+    $AG --ignore-case "$@"
   }
 
   function jgy-grep-word() {
-    ag --word-regexp --case-sensitive "$@"
+    $AG --word-regexp --case-sensitive "$@"
   }
 
   function jgy-grep-word-case-insensitive() {
-    ag --word-regexp --ignore-case "$@"
+    $AG --word-regexp --ignore-case "$@"
   }
 else
   echo "ag is not installed"
