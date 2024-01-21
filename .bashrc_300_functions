@@ -23,6 +23,7 @@ _exclude_matches=(
   deps
   dist
   doc
+  .elixir_ls
   .git
   node_modules
   *.pyc
