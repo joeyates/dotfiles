@@ -66,8 +66,9 @@ function jgy-find-files-and-directories() {
 unset _exclude_matches _excludes _match
 
 if which fzf >/dev/null ; then
-  # find files matching the input parameters
-  # if there's only one result, open it
+  # Find files matching the first parameter.
+  # Optionally, supply a path to search in.
+  # If there's only one result, open it
   # if there are no results, exit with non-zero
   # otherwise, present a menu
   # open the file that is chosen
