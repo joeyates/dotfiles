@@ -90,10 +90,14 @@
   ai                  = add --interactive
   # Add index entries for all unknown files
   an                  = add --intent-to-add .
+
+  ##########################
+  # committing
   cm                  = commit
   cmm                 = commit -m
   ca                  = commit --amend --no-edit
   cae                 = commit --amend
+  initial             = commit --allow-empty -m 'Initial commit'
 
   #########################
   # status
