@@ -67,5 +67,6 @@ alias ta='tmux attach'
 alias tg='tig `git rev-parse --abbrev-ref HEAD`'
 alias tga='tig --all'
 alias tmr='jgy-tmux-start'
+alias v='code --goto'
 
 # dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
