@@ -69,4 +69,5 @@ alias tga='tig --all'
 alias tmr='jgy-tmux-start'
 alias v='code --goto'
 
+alias kubectl="minikube kubectl --"
 # dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
