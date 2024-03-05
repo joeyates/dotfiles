@@ -1,0 +1,65 @@
+{
+  "Dump binding - all the variables in the current scope": {
+    "prefix": "db",
+    "body": [
+      "dbg(binding())$0"
+    ],
+    "description": "Dump binding - all the variables in the current scope"
+  },
+  "Debug-print variable": {
+    "prefix": "dbv",
+    "body": [
+      "dbg($1)$0"
+    ],
+    "description": "Dump binding - all the variables in the current scope"
+  },
+  "Pause the process for interactive debugging": {
+    "prefix": "pry",
+    "body": [
+      "require IEx; IEx.pry()$0"
+    ],
+    "description": "Pause the process for interactive debugging"
+  },
+  "Print a variable's name and value": {
+    "prefix": "pv",
+    "body": [
+      "IO.puts \"$1: #{$1}\"$0"
+    ],
+    "description": "Print a variable's name and value"
+  },
+  "Print a variable with the Logger as an error": {
+    "prefix": "lev",
+    "body": [
+      "require Logger; Logger.error \"$1: #{$1}\"$0"
+    ],
+    "description": "Print a variable with the Logger as an error"
+  },
+  "Print a variable with the Logger": {
+    "prefix": "lv",
+    "body": [
+      "require Logger; Logger.info \"$1: #{$1}\"$0"
+    ],
+    "description": "Print a variable with the Logger"
+  },
+  "Inspect a variable with the Logger as an error": {
+    "prefix": "lei",
+    "body": [
+      "require Logger; Logger.error \"$1: #{inspect($1)}\"$0"
+    ],
+    "description": "Inspect a variable with the Logger as an error"
+  },
+  "Inspect a variable with the Logger": {
+    "prefix": "li",
+    "body": [
+      "require Logger; Logger.info \"$1: #{inspect($1)}\"$0"
+    ],
+    "description": "Inspect a variable with the Logger"
+  },
+  "Inspect a value in a pipe and log as an error": {
+    "prefix": "|lei",
+    "body": [
+      "|> tap(& Logger.error(inspect(&1)))$0"
+    ],
+    "description": "Inspect a value in a pipe and log as an error"
+  }
+}

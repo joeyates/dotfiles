@@ -1,0 +1,44 @@
+{
+  "Inspect a value": {
+    "prefix": "pi",
+    "body": [
+      "puts \"${1:name}: #{${1:name}.inspect}\"$2"
+    ],
+    "description": "Inspect a value"
+  },
+  "Inspect a value with a label": {
+    "prefix": "pmi",
+    "body": [
+      "puts \"$1, ${2:name}: #{${2:name}.inspect}\"$3"
+    ],
+    "description": "Inspect a value with a label"
+  },
+  "Start interactive debugger": {
+    "prefix": "pry",
+    "body": [
+      "require \"pry-byebug\"; binding.pry$1"
+    ],
+    "description": "Start interactive debugger"
+  },
+  "Inspect the previous expression": {
+    "prefix": ".ptap",
+    "body": [
+      ".tap { |x| puts \"${1}: #{x.inspect}\" }$2",
+    ],
+    "description": "Inspect the previous expression and pass the expression on"
+  },
+  "Inspect the previous expression": {
+    "prefix": "ptap.",
+    "body": [
+      "tap { |x| puts \"${1}: #{x.inspect}\" }.$2",
+    ],
+    "description": "Inspect the previous expression and pass the expression on"
+  },
+  "Print a value": {
+    "prefix": "pv",
+    "body": [
+      "puts \"${1:name}: #{${1:name}}\"$2"
+    ],
+    "description": "Print a value"
+  },
+}
