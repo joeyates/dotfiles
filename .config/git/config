@@ -16,7 +16,7 @@
 [log]
   noprefix = true
 [mailmap]
-  file = "~/.gitmailmap"
+  file = "~/.config/git/mailmap"
 [merge]
   conflictstyle = diff3
   tool = meld
