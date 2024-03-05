@@ -1,0 +1,62 @@
+{
+    "comment": "Reference: https://github.com/VSCodeVim/Vim#vscodevim-settings",
+    "vim.cursorStylePerMode.normal": "line-thin",
+    "vim.cursorStylePerMode.insert": "line-thin",
+    "vim.cursorStylePerMode.replace": "line-thin",
+    "vim.cursorStylePerMode.visual": "line-thin",
+    "vim.cursorStylePerMode.visualblock": "line-thin",
+    "vim.cursorStylePerMode.visualline": "line-thin",
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+    "security.workspace.trust.untrustedFiles": "open",
+    "vim.neovimConfigPath": "~/.config/nvim/init.lua",
+    "vim.neovimPath": "/usr/bin/nvim",
+    "vim.neovimUseConfigFile": true,
+    "vim.enableNeovim": true,
+    "workbench.startupEditor": "none",
+    "editor.autoClosingBrackets": "never",
+    "editor.autoClosingDelete": "never",
+    "editor.autoClosingQuotes": "never",
+    "editor.minimap.enabled": false,
+    "vim.normalModeKeyBindingsNonRecursive.comment": "Handle :W as :w",
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                ":",
+                "W"
+            ],
+            "after": [
+                ":",
+                "w"
+            ]
+        }
+    ],
+    "git.openRepositoryInParentFolders": "never",
+    "editor.tabSize": 2,
+    "redhat.telemetry.enabled": false,
+    "workbench.editor.enablePreview": false,
+    "window.confirmSaveUntitledWorkspace": false,
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "prettier.bracketSpacing": false,
+    "prettier.jsxSingleQuote": true,
+    "prettier.semi": false,
+    "prettier.singleQuote": true,
+    "prettier.trailingComma": "none",
+    "prettier.arrowParens": "avoid",
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "editor.wordBasedSuggestions": "currentDocument",
+    "[elixir]": {
+        "editor.wordBasedSuggestions": "currentDocument"
+    }
+}
