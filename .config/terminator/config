@@ -1,55 +1,38 @@
 [global_config]
-  enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
   inactive_color_offset = 0.65641025641
-  title_transmit_fg_color = "#edd400"
-  title_use_system_font = False
+  enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
 [keybindings]
-[layouts]
-  [[default]]
-    [[[root]]]
-      fullscreen = True
-      last_active_term = 267b6039-4cc5-4a42-a7bc-b684ec562f10
-      last_active_window = True
-      maximised = False
-      order = 0
-      parent = ""
-      position = 0:0
-      size = 1920, 1080
-      title = terminal
-      type = Window
-    [[[split]]]
-      order = 0
-      parent = root
-      type = HPaned
-    [[[terminal2]]]
-      command = ""
-      directory = /home/joe
-      order = 0
-      parent = split
-      profile = default
-      type = Terminal
-      uuid = 267b6039-4cc5-4a42-a7bc-b684ec562f10
-    [[[terminal3]]]
-      command = jgy-tmux-start
-      directory = /home/joe
-      order = 1
-      parent = split
-      profile = default
-      type = Terminal
-      uuid = 414cc987-66aa-4720-869b-14b245aba1c7
-[plugins]
 [profiles]
   [[default]]
+    icon_bell = False
     background_color = "#0a1629"
     cursor_blink = False
-    cursor_color = "#eee8d5"
-    cursor_color_fg = False
     cursor_shape = ibeam
     font = MesloLGM Nerd Font Mono 13
     foreground_color = "#839496"
-    icon_bell = False
-    palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
-    scrollbar_position = hidden
     show_titlebar = False
-    use_system_font = False
+    scrollbar_position = hidden
+    palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
     word_chars = "-,.@/?%&#:_"
+    use_system_font = False
+[layouts]
+  [[default]]
+    [[[child0]]]
+      type = Window
+      parent = ""
+      order = 0
+      position = 0:0
+      maximised = False
+      fullscreen = True
+      size = 1503, 1002
+      title = terminal
+      last_active_term = 146b0fbd-fc92-437b-a37d-13cc94d98d70
+      last_active_window = True
+    [[[terminal1]]]
+      type = Terminal
+      parent = child0
+      order = 0
+      profile = default
+      command = jgy-tmux-start
+      uuid = 146b0fbd-fc92-437b-a37d-13cc94d98d70
+[plugins]
