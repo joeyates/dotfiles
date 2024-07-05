@@ -2,10 +2,12 @@
 # * ensure_all_documented
 # * ensure_all_set
 # It assumes .envrc lists all environment variables *required* by a project,
-# by exporting them set equal to an emty string:
+# by exporting them set equal to an empty string:
 #     export MYVAR=
-# while .envrc.private (which is excluded from source control)
-# supplies the values.
+# or, to the default value:
+#     export MYVAR=some-default
+# .envrc.private (which is excluded from source control) supplies the values
+# fro required variables.
 
 # Usage:
 # 1. In `.envrc`, document all exports:
