@@ -50,7 +50,7 @@ ensure_all_documented() (
   for (( i=0; i<${#exports[@]}; i++ ))
   do
     local export=${exports[$i]}
-    grep -P "^# $export\b" .envrc >/dev/null || __direnv_print_error "direnv: export $export does not have a comment"
+    grep -P "^# $export:" .envrc >/dev/null || __direnv_print_error "direnv: export $export does not have a comment"
   done
 )
 
