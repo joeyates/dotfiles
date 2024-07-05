@@ -12,8 +12,10 @@
 #
 #     # MYVAR: a value I want to set
 #     export MYVAR=
+#     # OTHERVAR: (optional) a value I might want to set
+#     export OTHERVAR=
 #
-# 2. In `.envrc.private`, set all values:
+# 2. In `.envrc.private`, set all required values:
 #
 #     export MYVAR=foo
 #
@@ -37,7 +39,8 @@ all_exports() (
   grep -Po '(?<=^export )[A-Z0-9_]+(?==)' .envrc
 )
 
-# Ensure that all exports from .envrc are documented
+# Ensure that all exports from .envrc are documented,
+# unless they are marked as (optional).
 # A comment should be as follows:
 # '# VARIABLE: documentation'
 ensure_all_documented() (
@@ -54,8 +57,12 @@ ensure_all_set() (
   for (( i=0; i<${#exports[@]}; i++ ))
   do
     local export=${exports[$i]}
+    # Skip optional exports
+    if grep -P "^# $export: \(optional\)" .envrc >/dev/null; then
+      continue
+    fi
     if [ -z ${!export} ]; then
-      __direnv_print_error "direnv: export $export is unset"
+      __direnv_print_error "direnv: export $export is unset. Either set it in .envrc.private or mark it as optional by adding a comment '# $export: (optional) ...'"
     fi
   done
 )
