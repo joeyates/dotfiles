@@ -1,3 +1,27 @@
+# This file provides the following direnv extensions:
+# * ensure_all_documented
+# * ensure_all_set
+# It assumes .envrc lists all environment variables *required* by a project,
+# by exporting them set equal to an emty string:
+#     export MYVAR=
+# while .envrc.private (which is excluded from source control)
+# supplies the values.
+
+# Usage:
+# 1. In `.envrc`, document all exports:
+#
+#     # MYVAR: a value I want to set
+#     export MYVAR=
+#
+# 2. In `.envrc.private`, set all values:
+#
+#     export MYVAR=foo
+#
+# 3. At the end of `.envrc.private`, invoke the extensions:
+#
+#     ensure_all_documented
+#     ensure_all_set
+
 __direnv_print_error() (
   local RED="\e[1;31m"
   local DEFAULT="\e[0m"
@@ -14,10 +38,6 @@ all_exports() (
 )
 
 # Ensure that all exports from .envrc are documented
-# This stems from the pattern where .envrc lists all
-# environment variables *required* by a project,
-# while .envrc.private (which is excluded from source control)
-# supplies the values.
 # A comment should be as follows:
 # '# VARIABLE: documentation'
 ensure_all_documented() (
