@@ -25,6 +25,7 @@ _exclude_matches=(
   doc
   .elixir_ls
   .git
+  .next
   node_modules
   *.pyc
   rel
