@@ -5,6 +5,9 @@
 # https://stackoverflow.com/questions/22147574/github-fatal-could-not-read-username-for-https-github-com-no-such-file-o/55656224#55656224
 [url "git@github.com:"]
   insteadOf = https://github.com/
+[branch]
+  # https://git-scm.com/docs/git-branch#Documentation/git-branch.txt-branchautoSetupRebase
+  autoSetupRebase = remote
 [pull]
   rebase = true
 [push]
