@@ -8,6 +8,7 @@ cover/
 coverage/
 deps/
 .elixir_ls/
+.envrc
 .envrc.*
 erl_crash.dump
 *.ez
