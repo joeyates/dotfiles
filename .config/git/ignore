@@ -17,4 +17,5 @@ node_modules/
 priv/static/assets/
 .rubocop-http*
 .session.nvim
+.vscode/
 yarn-error.log

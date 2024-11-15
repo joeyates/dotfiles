@@ -16,18 +16,18 @@
   "Start interactive debugger": {
     "prefix": "pry",
     "body": [
-      "require \"pry-byebug\"; binding.pry$1"
+      "require \"pry-byebug\"; binding.pry; 1$1"
     ],
     "description": "Start interactive debugger"
   },
-  "Inspect the previous expression": {
+  "Inspect the previous expression (with leading dot)": {
     "prefix": ".ptap",
     "body": [
       ".tap { |x| puts \"${1}: #{x.inspect}\" }$2",
     ],
     "description": "Inspect the previous expression and pass the expression on"
   },
-  "Inspect the previous expression": {
+  "Inspect the previous expression (with trailing dot)": {
     "prefix": "ptap.",
     "body": [
       "tap { |x| puts \"${1}: #{x.inspect}\" }.$2",

@@ -20,6 +20,13 @@
     ],
     "description": "Pause the process for interactive debugging"
   },
+  "Print a variable's name and inspect its value": {
+    "prefix": "pi",
+    "body": [
+      "IO.inspect $1, label: \"$1\"$0"
+    ],
+    "description": "Print a variable's name and inspect its value"
+  },
   "Print a variable's name and value": {
     "prefix": "pv",
     "body": [
