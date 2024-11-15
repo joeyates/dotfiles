@@ -14,6 +14,8 @@
   # https://git-scm.com/docs/git-rebase#Documentation/git-rebase.txt---autostash
   autostash = true
 [diff]
+  # https://git-scm.com/docs/diff-options#Documentation/diff-options.txt---diff-algorithmpatienceminimalhistogrammyers
+  algorithm = minimal
   noprefix = true
   renameLimit = 5000
 [diff "rspec"]
