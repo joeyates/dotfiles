@@ -39,6 +39,9 @@
   name = Joe Yates
   email = joe.g.yates@gmail.com
   signingkey = BE8BCCD1
+[advice]
+  # https://git-scm.com/docs/git-config#Documentation/git-config.txt-skippedCherryPicks
+  skippedCherryPicks = false
 [help]
   autocorrect = 1
 # For color.* settings see 'Variables' in git help config
