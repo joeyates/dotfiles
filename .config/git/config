@@ -1,4 +1,5 @@
 [init]
+  # https://git-scm.com/docs/git-init#Documentation/git-init.txt-initdefaultBranch
   defaultBranch = main
 # Fix installation problems when using the plug plugin manager in Neovim
 # https://stackoverflow.com/questions/22147574/github-fatal-could-not-read-username-for-https-github-com-no-such-file-o/55656224#55656224
@@ -7,6 +8,7 @@
 [pull]
   rebase = true
 [push]
+  # https://git-scm.com/docs/git-push#Documentation/git-push.txt-pushdefault
   default = current
 [diff]
   noprefix = true
