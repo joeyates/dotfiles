@@ -10,6 +10,9 @@
 [push]
   # https://git-scm.com/docs/git-push#Documentation/git-push.txt-pushdefault
   default = current
+[rebase]
+  # https://git-scm.com/docs/git-rebase#Documentation/git-rebase.txt---autostash
+  autostash = true
 [diff]
   noprefix = true
   renameLimit = 5000
