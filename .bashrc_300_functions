@@ -164,7 +164,8 @@ function jgy-ssh-keygen-usage() {
 # editor
 
 function jgy-edit {
-  nvr "$@"
+  # pip3 install neovim-remote
+  nvr -s "$@"
 }
 
 # Create a directory and `cd` into it
