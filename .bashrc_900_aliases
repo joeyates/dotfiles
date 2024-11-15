@@ -37,7 +37,8 @@ fi
 alias .g=dotgit
 alias g='git'
 alias ge='jgy-git-edit-file'
-alias h='history'
+# Last 50 shell commands
+alias h='history | tail -n 50'
 alias less='less -R'
 alias l='ls -lF'
 alias l1='ls -1A'
