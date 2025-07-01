@@ -18,7 +18,7 @@ gemfile do
   gem "thor"
 end
 
-BACKUP_MATCHES = [
+UNTRACKED_KEEPERS = [
   %r{^config/database.yml$},
   %r{^config/[\w\-\.]+\.secrets?\.exs},
   %r{^config/secrets.yml$},
@@ -75,7 +75,7 @@ class Keep
     untracked = Untracked.new(path: path).run
 
     untracked.select do |u|
-      BACKUP_MATCHES.any? { |rx| rx.match?(u) }
+      UNTRACKED_KEEPERS.any? { |rx| rx.match?(u) }
     end
   end
 
@@ -83,7 +83,7 @@ class Keep
     untracked = Untracked.new(path: path).run
 
     untracked.select do |u|
-      BACKUP_MATCHES.all? { |rx| !rx.match?(u) }
+      UNTRACKED_KEEPERS.all? { |rx| !rx.match?(u) }
     end
   end
 end
