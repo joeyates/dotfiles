@@ -195,7 +195,7 @@
 [tig]
   main-view = author:full commit-title:yes,graph=v2,refs=yes
   blame-view = author:full file-name:auto id:yes,color=yes text
-  mailmap = true # Replace author names with entries from ~/.gitmailmap
+  mailmap = true # Replace author names with entries from ~/.config/.git/mailmap
   line-graphics = utf-8 # Draw pretty connectors in tree layout
   #refresh-mode = periodic # Periodic (and auto) refresh does not seem to work
   #refresh-interval = 1
