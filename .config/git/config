@@ -181,7 +181,7 @@
   rc                  = rebase --continue
   # Create a temporary commit as an amendment to a previous commit
   # then run autosquash for confirmation
-  fix                 = !sh -c 'git commit --fixup $0 && git rebase --interactive --autosquash $0~1'
+  fix                 = !sh -c 'git commit --fixup $0 && git rebase --interactive --rebase-merges --autosquash $0~1'
 
   #########################
   # merging
