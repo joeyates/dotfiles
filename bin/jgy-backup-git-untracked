@@ -1,7 +1,14 @@
 #!/usr/bin/env ruby
 
-# jgy-backup-git-untracked ~/code /media/joe/backups/tempfiles/code
-# jgy-backup-git-untracked ~/work /media/joe/backups/tempfiles/work
+# This script is used to clean up git repositories and prepare them from removal from disk.
+# It has a concept of "useful" files, which are files that are not tracked by git,
+# but are useful to keep around, such as configuration files.
+# It also has a concept of "ignored" files, which are files that are not tracked by git,
+# and are not useful to keep around, such as temporary files or build artifacts.
+# It can list, backup and delete "useful", and it can list and delete "ignored" files.
+# The source path is expected to be a directory containing subdirectories
+# that contain git repositories.
+# This matches a situation where git repositories are nested beneath a username.
 
 require "bundler/inline"
 require "fileutils"
