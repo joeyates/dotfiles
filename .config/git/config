@@ -110,7 +110,7 @@
   bf                  = !sh -c 'git switch --create feature/$0'
   # [d]elete [r]emote [b]ranch
   # delete remote branch
-  drb                 = !sh -c 'git push origin :$0'
+  drb                 = !sh -c 'git push origin --delete $0'
 
   # [sw]itch
   # An abbreviation for 'switch'
