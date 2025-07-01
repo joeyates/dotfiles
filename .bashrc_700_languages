@@ -1,30 +1,7 @@
 # asdf
 
-jgy-asdf-linux() {
-  jgy-debug "Setting up asdf for Linux..."
-  . $HOME/.asdf/asdf.sh
-  . $HOME/.asdf/completions/asdf.bash
-}
-
-jgy-asdf-macos() {
-  jgy-debug "Checking for asdf for macOS..."
-  if which asdf >/dev/null ; then
-    jgy-debug "asdf found"
-    _asdf_dir=$(brew --prefix asdf)/libexec
-    . $_asdf_dir/asdf.sh
-  else
-    echo "No asdf found in PATH!" 1>&2
-  fi
-}
-
-case "$OSTYPE" in
-  "darwin"*)
-    jgy-asdf-macos
-    ;;
-  "linux"*)
-    jgy-asdf-linux
-    ;;
-esac
+export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+. <(asdf completion bash)
 
 # Erlang
 
