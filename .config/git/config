@@ -16,6 +16,9 @@
 [rebase]
   # https://git-scm.com/docs/git-rebase#Documentation/git-rebase.txt---autostash
   autostash = true
+  # https://git-scm.com/docs/git-rebase#Documentation/git-rebase.txt---update-refs
+  # This allows updating chains of stacked branches
+  updateRefs = true
 [diff]
   # https://git-scm.com/docs/diff-options#Documentation/diff-options.txt---diff-algorithmpatienceminimalhistogrammyers
   algorithm = minimal
