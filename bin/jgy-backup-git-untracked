@@ -205,7 +205,7 @@ class CLI < Thor
     def list(source)
       keeps(source).each do |(path, files)|
         puts "#{path}:"
-        puts files.join("\n")
+        puts "\t" + files.join("\n\t")
       end
     end
 
