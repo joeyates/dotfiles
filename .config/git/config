@@ -76,25 +76,40 @@
 
   #########################
   # updating
-  co                  = checkout
+
+  # [r]e[s]tore
+  # revert a file, directory or the whole repo to the versions in HEAD
+  rs                  = restore
   p                   = pull
   ps                  = push
   pf                  = push --force-with-lease
   fp                  = fetch --all --prune
+  # Deprecated
+  co                  = !sh -c 'echo Use rs or switch'
 
   #########################
   # branches
   b                   = branch
+  # [b]ranch [t]rack
+  # track a remote branch on 'origin'
+  bt                  = !sh -c 'git switch --create $0 --track origin/$0 && git pull'
   # create a local branch that tracks a remote branch
-  bt                  = !sh -c 'git checkout --track -b $0 origin/$0 && git pull'
   # [b]ranch [r]emote [t]rack
-  brt                 = !sh -c 'git checkout --track -b $1 $0/$1 && git pull'
+  # track a remote branch, specifying the remote
+  brt                 = !sh -c 'git switch --create $1 --track $0/$1 && git pull'
+  # [b]ranch [c]reate
   # create a new branch
-  bc                  = checkout -b
+  bc                  = switch --create
+  # [b]ranch [f]eature
   # create a 'feature/' branch
-  bf                  = !sh -c 'git checkout -b feature/$0'
+  bf                  = !sh -c 'git switch --create feature/$0'
+  # [d]elete [r]emote [b]ranch
   # delete remote branch
   drb                 = !sh -c 'git push origin :$0'
+
+  # [sw]itch
+  # An abbreviation for 'switch'
+  sw                  = switch
 
   #########################
   # blame
@@ -151,7 +166,6 @@
   # rebase
   ri                  = rebase --interactive --rebase-merges
   rc                  = rebase --continue
-  rs                  = rebase --skip
   # Create a temporary commit as an amendment to a previous commit
   # then run autosquash for confirmation
   fix                 = !sh -c 'git commit --fixup $0 && git rebase --interactive --autosquash $0~1'
