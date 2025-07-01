@@ -67,11 +67,14 @@
 [alias]
   #########################
   # configuration
+
+  # [c]onfig [l]ocal
   # list local config (from .git/config)
   cl                  = config --local --list
 
   #########################
   # files
+
   ls                  = ls-files
 
   #########################
@@ -89,11 +92,13 @@
 
   #########################
   # branches
+
+  # [b]ranch
+  # An abbreviation for 'branch'
   b                   = branch
   # [b]ranch [t]rack
   # track a remote branch on 'origin'
   bt                  = !sh -c 'git switch --create $0 --track origin/$0 && git pull'
-  # create a local branch that tracks a remote branch
   # [b]ranch [r]emote [t]rack
   # track a remote branch, specifying the remote
   brt                 = !sh -c 'git switch --create $1 --track $0/$1 && git pull'
@@ -113,12 +118,15 @@
 
   #########################
   # blame
+
+  # Show blame for a specific line
   # $ git blame-line <FILE> <LINE>
   blame-line          = !sh -c 'git blame -L $1,$1 $0'
   line-history        = !sh -c 'git log --pretty=short -u -L $1,$1:$0'
 
   #########################
   # staging
+
   a                   = add --patch
   ai                  = add --interactive
   # Add index entries for all unknown files
@@ -126,6 +134,7 @@
 
   ##########################
   # committing
+
   cm                  = commit
   cmm                 = commit -m
   ca                  = commit --amend --no-edit
@@ -134,6 +143,7 @@
 
   #########################
   # status
+
   s                   = status --short
   # d - show plain diff
   d                   = diff
@@ -153,17 +163,20 @@
 
   #########################
   # searching
+
   history-grep        = log -G
 
   #########################
   # history
-  # l - log (short sha + title)
+
+  # [l]og (short sha + title)
   l                   = log --pretty=format:\"%h %s\"
   lp                  = log --patch
   lns                 = log --name-status
 
   #########################
-  # rebase
+  # rebasing
+
   ri                  = rebase --interactive --rebase-merges
   rc                  = rebase --continue
   # Create a temporary commit as an amendment to a previous commit
@@ -171,7 +184,9 @@
   fix                 = !sh -c 'git commit --fixup $0 && git rebase --interactive --autosquash $0~1'
 
   #########################
-  # mf: 'merge feature', creating a merge commit
+  # merging
+
+  # [m]erge [f]eature
   mf                  = merge --no-ff --no-edit
 
 [github]
