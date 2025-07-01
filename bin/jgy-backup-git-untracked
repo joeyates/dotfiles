@@ -84,7 +84,7 @@ class Keep
     untracked = Untracked.new(path: path).run
 
     untracked.select do |u|
-      UNTRACKED_KEEPERS.all? { |rx| !rx.match?(u) }
+      UNTRACKED_KEEPERS.none? { |rx| rx.match?(u) }
     end
   end
 end
