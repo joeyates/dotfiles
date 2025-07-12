@@ -23,8 +23,8 @@ UNTRACKED_KEEPERS = [
   %r{^config/[\w\-\.]+\.secrets?\.exs},
   %r{^config/secrets\.yml$},
   %r{^data_bag_key$},
-  %r{^\.envrc.private$},
-  %r{^jgy-},
+  %r{(^|\/)\.envrc.private$},
+  %r{(^|\/)jgy-},
   %r{^key_for_data_bags?$}
 ]
 
