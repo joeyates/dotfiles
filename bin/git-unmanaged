@@ -1,0 +1,753 @@
+#!/usr/bin/env ruby
+
+# This script is used to manage unmanaged files in git repositories.
+# It has a concept of "useful" files, which are files that are not tracked by git,
+# but are useful to keep around, such as configuration files, see `UNTRACKED_KEEPERS`.
+# It also has a concept of "throwaway" files and directories, which are not tracked by git,
+# and are not useful to keep around, such as temporary files or build artifacts.
+# It can list, backup and delete "useful" files, and it can list and delete "throwaway" files and directories.
+# The `--root` path is expected to be a directory containing subdirectories
+# that contain git repositories.
+# This matches a situation where git repositories are nested beneath a username.
+# N.B. When looking for "useful" files, it can optionally (see the --recursive option)
+# recurse into subdirectories, but when looking for "throwaway" files,
+# it will only report files and directories indicated as untracked by git.
+
+require "bundler/inline"
+require "fileutils"
+require "logger"
+require "singleton"
+
+gemfile do
+  source "https://rubygems.org"
+  gem "pry-byebug"
+  gem "thor"
+end
+
+UNTRACKED_KEEPERS = [
+  %r{^config/[\w\-\.]+\.secrets?\.exs},
+  %r{^data_bag_key$},
+  %r{(^|\/)\.envrc.private$},
+  %r{(^|\/)jgy-},
+  %r{^key_for_data_bags?$}
+]
+
+class Log
+  include Singleton
+
+  def self.setup_logging(options = {})
+    instance.setup_logging(options)
+  end
+
+  def self.info(message)
+    instance.logger.info(message)
+  end
+
+  def self.debug(message)
+    instance.logger.debug(message)
+  end
+
+  attr_reader :logger
+
+  def initialize
+    @logger = Logger.new($stdout)
+    $stdout.sync = true
+  end
+
+  def setup_logging(options = {})
+    verbose_count = count(options.verbose)
+
+    logger.level =
+      case
+      when options.quiet
+        Logger::Severity::UNKNOWN
+      when verbose_count >= 2
+        Logger::Severity::DEBUG
+      else
+        Logger::Severity::INFO
+      end
+  end
+
+  def count(verbose)
+    verbose.reduce(1) { |acc, v| acc + (v ? 1 : -1) }
+  end
+end
+
+module FileHelpers
+  def files(path)
+    Dir.entries(path).
+      reject { |p| p == "." || p == ".." }.
+      map { |p| File.join(path, p) }.
+      flat_map do |p|
+        if File.directory?(p)
+          files(p)
+        else
+          p
+        end
+      end
+  end
+
+  def ensure_final_slash(directories)
+    directories.map do |d|
+      if d.end_with?("/")
+        d
+      else
+        "#{d}/"
+      end
+    end
+  end
+
+  def nested_git_repos(path)
+    first_level = directories(path)
+
+    paths = first_level.flat_map do |entry|
+      full_path = File.join(path, entry)
+      if git_repo?(full_path)
+        entry
+      else
+        ds = directories(full_path)
+        repos = ds.select do |d|
+          sub_path = File.join(full_path, d)
+          git_repo?(sub_path)
+        end
+        repos.map { |r| File.join(entry, r) }
+      end
+    end.sort
+  end
+
+  def optionally_delete(path, options)
+    if File.directory?(path)
+      optionally_delete_directory(path, options)
+    else
+      optionally_delete_file(path, options)
+    end
+  end
+
+  def optionally_delete_file(path, options)
+    if options.trash
+      if options.dry_run
+        Log.info "Would move file '#{path}' to the trash."
+      else
+        Log.debug "Moving file '#{path}' to the trash."
+        `trash-put '#{path}'`
+      end
+    else
+      if options.dry_run
+        Log.info "Would delete file '#{path}'."
+      else
+        Log.debug "Deleting file '#{path}'."
+        File.unlink(path)
+      end
+    end
+  end
+
+  def optionally_delete_directory(path, options)
+    if options.trash
+      if options.dry_run
+        Log.info "Would move directory '#{path}' to the trash."
+      else
+        Log.debug "Moving directory '#{path}' to the trash."
+        `trash-put '#{path}'`
+      end
+    else
+      if options.dry_run
+        Log.info "Would delete directory '#{path}'."
+      else
+        Log.debug "Deleting directory '#{path}'."
+        FileUtils.rm_rf(path)
+      end
+    end
+  end
+
+  private
+
+  def git_repo?(path)
+    File.directory?(File.join(path, ".git"))
+  end
+
+  def directories(path)
+    Dir.entries(path).
+      select { |p| File.directory?(File.join(path, p)) }.
+      reject { |p| p == "." || p == ".." }
+  end
+end
+
+module RemoteHelpers
+  def ssh_command(remote, command)
+    system("ssh -o LogLevel=quiet #{remote} '#{command}'")
+  end
+
+  def scp_command(from, to, options = {})
+    recursive = options[:recursive] ? "-r " : ""
+    command = "scp #{recursive}-o LogLevel=quiet #{from} #{to}"
+    system(command)
+  end
+end
+
+class Untracked
+  include FileHelpers
+
+  attr_reader :path
+  attr_reader :ignored_directories
+  attr_reader :recursive
+
+  def initialize(path:, ignored_directories: [], recursive: false)
+    @path = path
+    @ignored_directories = ignored_directories
+    @recursive = recursive
+  end
+
+  def run
+    Dir.chdir(path) do
+      entries.
+        flat_map do |file|
+          if File.directory?(file)
+            relative_path = File.join(path, file)
+            if ignored_directories.include?(relative_path)
+              []
+            else
+              all_files = files(file)
+              if recursive
+                all_files
+              else
+                all_files.select { |f| File.dirname(f) == "." }
+              end
+            end
+          else
+            if recursive
+              file
+            else
+              if File.dirname(file) == "."
+                file
+              else
+                []
+              end
+            end
+          end
+      end
+    end
+  end
+
+  def plain
+    Dir.chdir(path) do
+      entries
+    end
+  end
+
+  private
+
+  def entries
+    raw_untracked.
+      split("\n").
+      map { |line| line.gsub(/^Would remove /, "") }
+  end
+
+  def raw_untracked
+    `git clean -nffdx`
+  end
+end
+
+class Keep
+  attr_reader :path
+  attr_reader :ignored_directories
+  attr_reader :recursive
+
+  def initialize(path:, ignored_directories: [], recursive: false)
+    @path = path
+    @ignored_directories = ignored_directories
+    @recursive = recursive
+  end
+
+  def run
+    untracked = Untracked.new(
+      path: path, recursive: recursive, ignored_directories: ignored_directories
+    )
+    untracked.run.select do |u|
+      UNTRACKED_KEEPERS.any? { |rx| rx.match?(u) }
+    end
+  end
+
+  def throwaway
+    untracked = Untracked.new(path: path)
+    untracked.plain.select do |u|
+      UNTRACKED_KEEPERS.none? { |rx| rx.match?(u) }
+    end
+  end
+end
+
+class BackupOptions
+  attr_reader :delete_uploaded
+  attr_reader :dry_run
+  attr_reader :force
+  attr_reader :trash
+
+  def initialize(delete_uploaded: false, dry_run: false, force: false, trash: false)
+    @delete_uploaded = delete_uploaded
+    @dry_run = dry_run
+    @force = force
+    @trash = trash
+  end
+end
+
+class Backup
+  include RemoteHelpers
+
+  attr_reader :backup_root
+  attr_reader :files
+  attr_reader :options
+  attr_reader :subdirectory
+  attr_reader :remote
+  attr_reader :root
+
+  def initialize(root:, remote:, backup_root:, subdirectory:, files:, options: BackupOptions.new)
+    @backup_root = backup_root
+    @files = files
+    @options = options
+    @subdirectory = subdirectory
+    @remote = remote
+    @root = root
+  end
+
+  def run
+    copy_files
+  end
+
+  private
+
+  def copy_files
+    if !remote_directory_exists?
+      if options.dry_run
+        Log.info "Would create remote project directory: #{destination_path}"
+      else
+        Log.debug "Creating remote project directory: #{destination_path}"
+        ssh_command(remote, "mkdir -p #{destination_path}")
+      end
+    end
+    files.map do |file|
+      copy_file(file)
+    end
+  end
+
+  def copy_file(file)
+    if !options.force
+      if remote_file_exists?(file)
+        if !options.dry_run
+          Log.debug "File '#{file}' already exists in #{destination_path}, skipping."
+        else
+          Log.info "Would skip file '#{file}' as it already exists in #{destination_path}."
+        end
+        return
+      end
+    end
+
+    ensure_destination(file)
+    successful = scp_upload(file)
+
+    if successful && options.delete_uploaded
+      relative_path = File.join(root_path, file)
+      optionally_delete_file(relative_path, options)
+    end
+  end
+
+  def remote_file_exists?(filename)
+    full_path = File.join(destination_path, filename)
+    ssh_command(remote, "test -e #{full_path}")
+  end
+
+  def scp_upload(file)
+    relative_path = File.join(root_path, file)
+    destination_file = File.join(destination_path, file)
+
+    if options.dry_run
+      Log.info "Would copy file '#{relative_path}' to '#{remote}:#{destination_file}'"
+    else
+      Log.debug "Copying file '#{relative_path}' to '#{remote}:#{destination_file}'"
+      scp_command(relative_path, "#{remote}:#{destination_file}")
+    end
+  end
+
+  def remote_directory_exists?(directory = ".")
+    full_path = 
+      if directory == "."
+        destination_path
+      else
+        File.join(destination_path, directory)
+      end
+
+    ssh_command(remote, "test -d #{full_path}")
+  end
+
+  def destination_path
+    File.join(backup_root, subdirectory)
+  end
+
+  def root_path
+    File.join(root, subdirectory)
+  end
+
+  def ensure_destination(filename)
+    path = File.dirname(filename)
+    if path != "."
+      if !remote_directory_exists?(path)
+        full_path = File.join(destination_path, path)
+
+        if options.dry_run
+          Log.info "Would create destination directory: #{full_path}"
+        else
+          Log.debug "Creating destination directory: #{full_path}"
+          ssh_command(remote, "mkdir -p #{full_path}")
+        end
+      end
+    end
+  end
+end
+
+class RestoreOptions
+  attr_reader :dry_run
+  attr_reader :trash
+
+  def initialize(dry_run: false, trash: false)
+    @dry_run = dry_run
+    @trash = trash
+  end
+end
+
+class Restore
+  include RemoteHelpers
+
+  attr_reader :backup_root
+  attr_reader :options
+  attr_reader :remote
+  attr_reader :root
+  attr_reader :subdirectory
+
+  def initialize(root:, remote:, backup_root:, subdirectory:, options: RestoreOptions.new)
+    @backup_root = backup_root
+    @options = options
+    @remote = remote
+    @root = root
+    @subdirectory = subdirectory
+  end
+
+  def run
+    if options.dry_run
+      Log.info "Would copy files from '#{remote}:#{backup_path}' to '#{root_path}'"
+    else
+      Log.debug "Copying file '#{remote}:#{backup_path}' to '#{root_path}'"
+      scp_command("#{remote}:#{backup_path}/*", "#{root_path}/", recursive: true)
+    end
+  end
+
+  private
+
+  def backup_path
+    File.join(backup_root, subdirectory)
+  end
+
+  def root_path
+    File.join(root, subdirectory)
+  end
+end
+
+class CLI < Thor
+  module Options
+    def self.included(base)
+      define(base)
+    end
+
+    def self.define(base)
+      base.singleton_class.class_eval do
+        def backup_root_option
+          method_option(
+            "backup_root",
+            type: :string,
+            desc: "directory where files are backed-up on the remote host",
+            required: true
+          )
+        end
+
+        def dry_run_option
+          method_option(
+            "dry_run",
+            type: :boolean,
+            desc: "do not actually perform the backup, just print what would be done",
+            default: false
+          )
+        end
+
+        def force_option
+          method_option(
+            "force",
+            type: :boolean,
+            desc: "overwrite already backed up files",
+            default: false
+          )
+        end
+
+        def ignore_directory_option
+          method_option(
+            "ignore_directory",
+            type: :string,
+            repeatable: true,
+            desc: "list of directories (relative to the root directory) to ignore when selecting files",
+            default: []
+          )
+        end
+
+        def quiet_option
+          method_option(
+            "quiet",
+            type: :boolean,
+            desc: "suppress output",
+            aliases: "-q",
+            default: false
+          )
+        end
+
+        def recursive_option
+          method_option(
+            "recursive",
+            type: :boolean,
+            desc: "recurse into subdirectories when selecting files (N.B. if an untracked directory is a subdirectory, it will still be included even if this options is false)",
+            default: false
+          )
+        end
+
+        def remote_option
+          method_option(
+            "remote",
+            type: :string,
+            desc: "a hostname, or user@hostname combination",
+            required: true
+          )
+        end
+
+        def root_option
+          method_option(
+            "root",
+            type: :string,
+            aliases: "-r",
+            desc: "local directory containing nested git repositories",
+            required: true
+          )
+        end
+
+        def trash_option
+          method_option(
+            "trash",
+            type: :boolean,
+            desc: "move files to the trash instead of deleting them",
+            default: false
+          )
+        end
+
+        def verbose_option
+          method_option(
+            "verbose",
+            type: :boolean,
+            desc: "print verbose output",
+            aliases: "-v",
+            repeatable: true,
+            default: []
+          )
+        end
+      end
+    end
+  end
+
+  class Throwaway < Thor
+    include Thor::Actions
+    include Options
+    include FileHelpers
+
+    desc "list", "List throwaway files"
+    ignore_directory_option
+    quiet_option
+    recursive_option
+    root_option
+    verbose_option
+    def list
+      root = File.expand_path(options.root)
+      paths = nested_git_repos(root)
+
+      paths.each do |entry|
+        full_path = File.join(options.root, entry)
+        throwaway_files = throwaway(entry)
+        if throwaway_files.any?
+          puts "#{entry}:"
+          puts "\t" + throwaway_files.join("\n\t")
+        end
+      end
+    end
+
+    desc "delete", "Delete throwaway files"
+    dry_run_option
+    ignore_directory_option
+    quiet_option
+    root_option
+    trash_option
+    verbose_option
+    def delete
+      root = File.expand_path(options.root)
+      paths = nested_git_repos(root)
+
+      paths.each do |entry|
+        full_path = File.join(options.root, entry)
+        throwaway_files = throwaway(entry)
+        throwaway_files.each do |p|
+          relative_path = File.join(full_path, p)
+          optionally_delete(relative_path, options)
+        end
+      end
+    end
+
+    no_commands do
+      def throwaway(entry)
+        root = File.expand_path(options.root)
+
+        Dir.chdir(root) do
+          Keep.new(
+            path: entry,
+            ignored_directories: ignored_directories
+          ).throwaway
+        end
+      end
+
+      def ignored_directories
+        ensure_final_slash(options.ignore_directory)
+      end
+    end
+  end
+
+  desc "throwaway SUBCOMMAND [OPTIONS]", "Manage throwaway files"
+  subcommand "throwaway", Throwaway
+
+  class Useful < Thor
+    include Thor::Actions
+    include Options
+    include FileHelpers
+
+    desc "list", "List useful files"
+    dry_run_option
+    ignore_directory_option
+    quiet_option
+    recursive_option
+    root_option
+    verbose_option
+    def list
+      keeps.each do |(path, files)|
+        puts "#{path}:"
+        puts "\t" + files.join("\n\t")
+      end
+    end
+
+    desc "backup [OPTIONS]", "Backup useful files"
+    backup_root_option
+    dry_run_option
+    force_option
+    ignore_directory_option
+    quiet_option
+    recursive_option
+    remote_option
+    root_option
+    trash_option
+    verbose_option
+    method_option(
+      "delete_uploaded",
+      type: :boolean,
+      desc: "delete files after backup",
+      default: false
+    )
+    def backup
+      Log.setup_logging(options)
+      Log.info("Starting backup...")
+
+      backup_options = BackupOptions.new(
+        delete_uploaded: options.delete_uploaded,
+        dry_run: options.dry_run,
+        force: options.force,
+        trash: options.trash
+      )
+
+      root = File.expand_path(options.root)
+
+      keeps.each do |(subdirectory, files)|
+        Backup.new(
+          root: root,
+          subdirectory: subdirectory,
+          files: files,
+          remote: options.remote,
+          backup_root: options.backup_root,
+          options: backup_options
+        ).run
+      end
+    end
+
+    desc "restore [OPTIONS]", "Restore 'useful' files"
+    backup_root_option
+    dry_run_option
+    quiet_option
+    remote_option
+    root_option
+    trash_option
+    verbose_option
+    method_option(
+      "subdirectory",
+      type: :string,
+      desc: "subdirectory to restore files from",
+      required: true
+    )
+    def restore
+      Log.setup_logging(options)
+      Log.info("Starting restore...")
+
+      restore_options = RestoreOptions.new(
+        dry_run: options.dry_run,
+        trash: options.trash
+      )
+
+      root = File.expand_path(options.root)
+
+      Restore.new(
+        remote: options.remote,
+        backup_root: options.backup_root,
+        subdirectory: options.subdirectory,
+        root: root,
+        options: restore_options
+      ).run
+    end
+
+    no_commands do
+      def keeps
+        paths = nested_git_repos(options.root)
+        root = File.expand_path(options.root)
+
+        Dir.chdir(root) do
+          paths.map do |entry|
+            keep = Keep.new(
+              path: entry,
+              ignored_directories: ignored_directories,
+              recursive: options.recursive
+            ).run
+            if keep.any?
+              [entry, keep]
+            end
+          end
+        end.compact
+      end
+
+      def ignored_directories
+        ensure_final_slash(options.ignore_directory)
+      end
+    end
+  end
+
+  def self.exit_on_failure?
+    true
+  end
+
+  desc "useful SUBCOMMAND [OPTIONS]", "Manage useful files"
+  subcommand "useful", Useful
+end
+
+CLI.start(ARGV)
