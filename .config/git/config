@@ -45,6 +45,8 @@
 [advice]
   # https://git-scm.com/docs/git-config#Documentation/git-config.txt-skippedCherryPicks
   skippedCherryPicks = false
+[unmanaged]
+  useful = "(^data_bag_key$|(^|\\/)\\.envrc.private$|(^|\\/)jgy-|^key_for_data_bags?$)"
 [help]
   autocorrect = 1
 # For color.* settings see 'Variables' in git help config

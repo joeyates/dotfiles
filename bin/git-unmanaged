@@ -2,7 +2,7 @@
 
 # This script is used to manage unmanaged files in git repositories.
 # It has a concept of "useful" files, which are files that are not tracked by git,
-# but are useful to keep around, such as configuration files, see `UNTRACKED_KEEPERS`.
+# but are useful to keep around, such as configuration files, see `UsefulFiles`.
 # It also has a concept of "throwaway" files and directories, which are not tracked by git,
 # and are not useful to keep around, such as temporary files or build artifacts.
 # It can list, backup and delete "useful" files, and it can list and delete "throwaway" files and directories.
@@ -20,17 +20,31 @@ require "singleton"
 
 gemfile do
   source "https://rubygems.org"
+  gem "git"
   gem "pry-byebug"
   gem "thor"
 end
 
-UNTRACKED_KEEPERS = [
-  %r{^config/[\w\-\.]+\.secrets?\.exs},
-  %r{^data_bag_key$},
-  %r{(^|\/)\.envrc.private$},
-  %r{(^|\/)jgy-},
-  %r{^key_for_data_bags?$}
-]
+class UsefulFiles
+  # The pattern for useful files is stored in the git config.
+  # It should be set in the [unmanaged] section, ias the key "useful".
+  # It should be a regular expression made up of a pipe-separated list of patterns.
+  # Example:
+  #     [unmanaged]
+  #       useful = "(^some_exact_match$|(^|/)\\maybe_in_subdirectory$|(^|/)match_prefix-)"
+  # Note that all backslashes in the patterns must be escaped.
+  CONFIG_KEY = "unmanaged.useful"
+  git = Git.init
+  if git.config[CONFIG_KEY].nil?
+    raise "No '#{CONFIG_KEY}' configuration found. Please set it in your git config."
+  end
+  patterns = git.config[CONFIG_KEY]
+  MATCHES = Regexp.new(patterns)
+
+  def self.match?(filename)
+    MATCHES.match?(filename)
+  end
+end
 
 class Log
   include Singleton
@@ -262,16 +276,12 @@ class Keep
     untracked = Untracked.new(
       path: path, recursive: recursive, ignored_directories: ignored_directories
     )
-    untracked.run.select do |u|
-      UNTRACKED_KEEPERS.any? { |rx| rx.match?(u) }
-    end
+    untracked.run.select { |file| UsefulFiles.match?(file) }
   end
 
   def throwaway
     untracked = Untracked.new(path: path)
-    untracked.plain.select do |u|
-      UNTRACKED_KEEPERS.none? { |rx| rx.match?(u) }
-    end
+    untracked.plain.select { |file| !UsefulFiles.match?(file) }
   end
 end
 
@@ -536,7 +546,7 @@ class CLI < Thor
           method_option(
             "trash",
             type: :boolean,
-            desc: "move files to the trash instead of deleting them",
+            desc: "move files to the trash instead of deleting them (requires `trash-cli` to be installed)",
             default: false
           )
         end
@@ -719,8 +729,8 @@ class CLI < Thor
 
     no_commands do
       def keeps
-        paths = nested_git_repos(options.root)
         root = File.expand_path(options.root)
+        paths = nested_git_repos(root)
 
         Dir.chdir(root) do
           paths.map do |entry|
