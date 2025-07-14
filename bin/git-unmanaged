@@ -644,6 +644,49 @@ class CLI < Thor
       end
     end
 
+    desc "backup [OPTIONS]", "Backup useful files for a single project"
+    backup_path_option
+    dry_run_option
+    force_option
+    ignore_directory_option
+    local_path_option
+    quiet_option
+    recursive_option
+    remote_option
+    trash_option
+    verbose_option
+    method_option(
+      "delete_uploaded",
+      type: :boolean,
+      desc: "delete files after backup",
+      default: false
+    )
+    def backup
+      Log.setup_logging(options)
+      Log.info("Starting backup...")
+
+      backup_options = BackupOptions.new(
+        delete_uploaded: options.delete_uploaded,
+        dry_run: options.dry_run,
+        force: options.force,
+        trash: options.trash
+      )
+
+      files = keep(
+        local_path: options.local_path,
+        ignore_directory: options.ignore_directory,
+        recursive: options.recursive
+      )
+
+      Backup.new(
+        local_path: options.local_path,
+        remote: options.remote,
+        backup_path: options.backup_path,
+        files: files,
+        options: backup_options
+      ).run
+    end
+
     desc "backup-all [OPTIONS]", "Backup useful files from all projects"
     backup_root_option
     dry_run_option
