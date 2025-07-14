@@ -302,20 +302,18 @@ end
 class Backup
   include RemoteHelpers
 
-  attr_reader :backup_root
+  attr_reader :backup_path
   attr_reader :files
+  attr_reader :local_path
   attr_reader :options
-  attr_reader :subdirectory
   attr_reader :remote
-  attr_reader :root
 
-  def initialize(root:, remote:, backup_root:, subdirectory:, files:, options: BackupOptions.new)
-    @backup_root = backup_root
+  def initialize(local_path:, remote:, backup_path:, files:, options: BackupOptions.new)
+    @backup_path = backup_path
     @files = files
+    @local_path = local_path
     @options = options
-    @subdirectory = subdirectory
     @remote = remote
-    @root = root
   end
 
   def run
@@ -327,10 +325,10 @@ class Backup
   def copy_files
     if !remote_directory_exists?
       if options.dry_run
-        Log.info "Would create remote project directory: #{destination_path}"
+        Log.info "Would create remote project directory: #{backup_path}"
       else
-        Log.debug "Creating remote project directory: #{destination_path}"
-        ssh_command(remote, "mkdir -p #{destination_path}")
+        Log.debug "Creating remote project directory: #{backup_path}"
+        ssh_command(remote, "mkdir -p #{backup_path}")
       end
     end
     files.map do |file|
@@ -342,9 +340,9 @@ class Backup
     if !options.force
       if remote_file_exists?(file)
         if !options.dry_run
-          Log.debug "File '#{file}' already exists in #{destination_path}, skipping."
+          Log.debug "File '#{file}' already exists in #{backup_path}, skipping."
         else
-          Log.info "Would skip file '#{file}' as it already exists in #{destination_path}."
+          Log.info "Would skip file '#{file}' as it already exists in #{backup_path}."
         end
         return
       end
@@ -354,19 +352,19 @@ class Backup
     successful = scp_upload(file)
 
     if successful && options.delete_uploaded
-      relative_path = File.join(root_path, file)
+      relative_path = File.join(local_path, file)
       optionally_delete_file(relative_path, options)
     end
   end
 
   def remote_file_exists?(filename)
-    full_path = File.join(destination_path, filename)
+    full_path = File.join(backup_path, filename)
     ssh_command(remote, "test -e #{full_path}")
   end
 
   def scp_upload(file)
-    relative_path = File.join(root_path, file)
-    destination_file = File.join(destination_path, file)
+    relative_path = File.join(local_path, file)
+    destination_file = File.join(backup_path, file)
 
     if options.dry_run
       Log.info "Would copy file '#{relative_path}' to '#{remote}:#{destination_file}'"
@@ -379,27 +377,19 @@ class Backup
   def remote_directory_exists?(directory = ".")
     full_path = 
       if directory == "."
-        destination_path
+        backup_path
       else
-        File.join(destination_path, directory)
+        File.join(backup_path, directory)
       end
 
     ssh_command(remote, "test -d #{full_path}")
-  end
-
-  def destination_path
-    File.join(backup_root, subdirectory)
-  end
-
-  def root_path
-    File.join(root, subdirectory)
   end
 
   def ensure_destination(filename)
     path = File.dirname(filename)
     if path != "."
       if !remote_directory_exists?(path)
-        full_path = File.join(destination_path, path)
+        full_path = File.join(backup_path, path)
 
         if options.dry_run
           Log.info "Would create destination directory: #{full_path}"
@@ -414,48 +404,34 @@ end
 
 class RestoreOptions
   attr_reader :dry_run
-  attr_reader :trash
 
-  def initialize(dry_run: false, trash: false)
+  def initialize(dry_run: false)
     @dry_run = dry_run
-    @trash = trash
   end
 end
 
 class Restore
   include RemoteHelpers
 
-  attr_reader :backup_root
+  attr_reader :backup_path
+  attr_reader :local_path
   attr_reader :options
   attr_reader :remote
-  attr_reader :root
-  attr_reader :subdirectory
 
-  def initialize(root:, remote:, backup_root:, subdirectory:, options: RestoreOptions.new)
-    @backup_root = backup_root
+  def initialize(local_path:, remote:, backup_path:, options: RestoreOptions.new)
+    @backup_path = backup_path
+    @local_path = local_path
     @options = options
     @remote = remote
-    @root = root
-    @subdirectory = subdirectory
   end
 
   def run
     if options.dry_run
-      Log.info "Would copy files from '#{remote}:#{backup_path}' to '#{root_path}'"
+      Log.info "Would copy files from '#{remote}:#{backup_path}' to '#{local_path}'"
     else
-      Log.debug "Copying file '#{remote}:#{backup_path}' to '#{root_path}'"
-      scp_command("#{remote}:#{backup_path}/*", "#{root_path}/", recursive: true)
+      Log.debug "Copying file '#{remote}:#{backup_path}' to '#{local_path}'"
+      scp_command("#{remote}:#{backup_path}/*", "#{local_path}/", recursive: true)
     end
-  end
-
-  private
-
-  def backup_path
-    File.join(backup_root, subdirectory)
-  end
-
-  def root_path
-    File.join(root, subdirectory)
   end
 end
 
@@ -467,6 +443,15 @@ class CLI < Thor
 
     def self.define(base)
       base.singleton_class.class_eval do
+        def backup_path_option
+          method_option(
+            "backup_path",
+            type: :string,
+            desc: "directory where files are backed-up on the remote host",
+            required: true
+          )
+        end
+
         def backup_root_option
           method_option(
             "backup_root",
@@ -501,6 +486,15 @@ class CLI < Thor
             repeatable: true,
             desc: "list of directories (relative to the root directory) to ignore when selecting files",
             default: []
+          )
+        end
+
+        def local_path_option
+          method_option(
+            "local_path",
+            type: :string,
+            desc: "local directory containing the git repository",
+            default: "."
           )
         end
 
@@ -570,13 +564,13 @@ class CLI < Thor
     include Options
     include FileHelpers
 
-    desc "list", "List throwaway files"
+    desc "list-all", "List throwaway files from all projects"
     ignore_directory_option
     quiet_option
     recursive_option
     root_option
     verbose_option
-    def list
+    def list_all
       root = File.expand_path(options.root)
       paths = nested_git_repos(root)
 
@@ -590,14 +584,14 @@ class CLI < Thor
       end
     end
 
-    desc "delete", "Delete throwaway files"
+    desc "delete-all", "Delete throwaway files from all projects"
     dry_run_option
     ignore_directory_option
     quiet_option
     root_option
     trash_option
     verbose_option
-    def delete
+    def delete_all
       root = File.expand_path(options.root)
       paths = nested_git_repos(root)
 
@@ -637,8 +631,7 @@ class CLI < Thor
     include Options
     include FileHelpers
 
-    desc "list", "List useful files"
-    dry_run_option
+    desc "list-all", "List useful files from all projects"
     ignore_directory_option
     quiet_option
     recursive_option
@@ -651,7 +644,7 @@ class CLI < Thor
       end
     end
 
-    desc "backup [OPTIONS]", "Backup useful files"
+    desc "backup-all [OPTIONS]", "Backup useful files from all projects"
     backup_root_option
     dry_run_option
     force_option
@@ -668,7 +661,7 @@ class CLI < Thor
       desc: "delete files after backup",
       default: false
     )
-    def backup
+    def backup_all
       Log.setup_logging(options)
       Log.info("Starting backup...")
 
@@ -682,61 +675,60 @@ class CLI < Thor
       root = File.expand_path(options.root)
 
       keeps.each do |(subdirectory, files)|
+        local_path = File.join(root, subdirectory)
+        backup_path = File.join(options.backup_root, subdirectory)
+
         Backup.new(
-          root: root,
-          subdirectory: subdirectory,
-          files: files,
+          local_path: local_path,
           remote: options.remote,
-          backup_root: options.backup_root,
+          backup_path: backup_path,
+          files: files,
           options: backup_options
         ).run
       end
     end
 
-    desc "restore [OPTIONS]", "Restore 'useful' files"
-    backup_root_option
+    desc "restore [OPTIONS]", "Restore 'useful' files for a project"
+    backup_path_option
     dry_run_option
+    local_path_option
     quiet_option
     remote_option
     root_option
-    trash_option
     verbose_option
-    method_option(
-      "subdirectory",
-      type: :string,
-      desc: "subdirectory to restore files from",
-      required: true
-    )
     def restore
       Log.setup_logging(options)
       Log.info("Starting restore...")
 
-      restore_options = RestoreOptions.new(
-        dry_run: options.dry_run,
-        trash: options.trash
-      )
-
-      root = File.expand_path(options.root)
+      restore_options = RestoreOptions.new(dry_run: options.dry_run)
+      local_path = File.expand_path(options.local_path)
 
       Restore.new(
         remote: options.remote,
-        backup_root: options.backup_root,
-        subdirectory: options.subdirectory,
-        root: root,
+        backup_path: options.backup_path,
+        local_path: local_path,
         options: restore_options
       ).run
     end
 
     no_commands do
-      def keeps
-        root = File.expand_path(options.root)
-        paths = nested_git_repos(root)
+      def keep(local_path:, ignore_directory:, recursive:)
+        Keep.new(
+          path: local_path,
+          ignored_directories: ignored_directories(ignore_directory),
+          recursive: recursive
+        ).run
+      end
+
+      def keeps(root: ".", ignore_directory: [], recursive: false, **_ignored)
+        absolute_root = File.expand_path(root)
+        paths = nested_git_repos(absolute_root)
 
         Dir.chdir(root) do
           paths.map do |entry|
             keep = Keep.new(
               path: entry,
-              ignored_directories: ignored_directories,
+              ignored_directories: ignored_directories(ignore_directory),
               recursive: options.recursive
             ).run
             if keep.any?
@@ -746,8 +738,8 @@ class CLI < Thor
         end.compact
       end
 
-      def ignored_directories
-        ensure_final_slash(options.ignore_directory)
+      def ignored_directories(ignore_directory)
+        ensure_final_slash(ignore_directory)
       end
     end
   end
