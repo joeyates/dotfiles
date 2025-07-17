@@ -22,7 +22,7 @@ defmodule Network do
 
     puts "[OK] Gateway: #{gateway_interface} #{gateway_ip}"
 
-    ping_quality = get_ping_quality(gateway_ip)
+    {:ok, ping_quality} = get_ping_quality(gateway_ip)
 
     if ping_quality == 0 do
       raise "[Error] gateway unreachable"
@@ -34,7 +34,7 @@ defmodule Network do
 
     puts "[OK] Gateway accessible"
 
-    public_ip_ping_quality = get_ping_quality(@well_known_public_ip)
+    {:ok, public_ip_ping_quality} = get_ping_quality(@well_known_public_ip)
 
     if public_ip_ping_quality == 0 do
       raise "[Error] Internet unreachable"
@@ -53,7 +53,7 @@ defmodule Network do
     |> map(&(Regex.run(~r/\w+/, &1)))
     |> filter(&(&1))
     |> map(&Kernel.hd/1)
-    |> slice(2..-1)
+    |> slice(2..-1//1)
   end
 
   def list_interfaces(interfaces) do
@@ -101,7 +101,8 @@ defmodule Network do
     end
 
     case Regex.run(~r/(\d+)% packet loss/m, packet_loss) do
-      nil -> {:error, "ping format unrecognized"}
+      nil ->
+        {:error, "ping format unrecognized"}
       [_match, percentage] ->
         {loss, _rest} = Integer.parse(percentage)
         {:ok, 100 - loss}
