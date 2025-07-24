@@ -428,7 +428,7 @@ class Restore
 
   def run
     if options.dry_run
-      Log.info "Would copy files from '#{remote}:#{backup_path}' to '#{local_path}'"
+      Log.info "Would copy the content of '#{remote}:#{backup_path}' to '#{local_path}'"
     else
       Log.debug "Copying contents of '#{remote}:#{backup_path}' to '#{local_path}'"
       system("rsync --archive --verbose --compress --progress #{remote}:#{backup_path}/ #{local_path}/")
