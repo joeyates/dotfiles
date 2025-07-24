@@ -476,6 +476,7 @@ class CLI < Thor
             "force",
             type: :boolean,
             desc: "overwrite already backed up files",
+            aliases: "-f",
             default: false
           )
         end
