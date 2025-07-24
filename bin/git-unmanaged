@@ -429,8 +429,8 @@ class Restore
     if options.dry_run
       Log.info "Would copy files from '#{remote}:#{backup_path}' to '#{local_path}'"
     else
-      Log.debug "Copying file '#{remote}:#{backup_path}' to '#{local_path}'"
-      scp_command("#{remote}:#{backup_path}/*", "#{local_path}/", recursive: true)
+      Log.debug "Copying contents of '#{remote}:#{backup_path}' to '#{local_path}'"
+      system("rsync --archive --verbose --compress --progress #{remote}:#{backup_path}/ #{local_path}/")
     end
   end
 end
