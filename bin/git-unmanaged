@@ -300,6 +300,7 @@ class BackupOptions
 end
 
 class Backup
+  include FileHelpers
   include RemoteHelpers
 
   attr_reader :backup_path
