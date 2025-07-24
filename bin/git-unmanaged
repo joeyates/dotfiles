@@ -739,7 +739,6 @@ class CLI < Thor
     local_path_option
     quiet_option
     remote_option
-    root_option
     verbose_option
     def restore
       Log.setup_logging(options)
