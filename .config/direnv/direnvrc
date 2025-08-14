@@ -6,8 +6,8 @@
 #     export MYVAR=
 # or, to the default value:
 #     export MYVAR=some-default
-# .envrc.private (which is excluded from source control) supplies the values
-# fro required variables.
+# .envrc.private (which should be excluded from source control) supplies the values
+# for required variables.
 
 # Usage:
 # 1. In `.envrc`, document all exports:
@@ -17,14 +17,25 @@
 #     # OTHERVAR: (optional) a value I might want to set
 #     export OTHERVAR=
 #
+#     source_env .envrc.private
+#
 # 2. In `.envrc.private`, set all required values:
 #
 #     export MYVAR=foo
 #
-# 3. At the end of `.envrc.private`, invoke the extensions:
+# 3. At the end of `.envrc`, invoke the extensions (after checing they are available):
 #
-#     ensure_all_documented
-#     ensure_all_set
+#     if has ensure_all_documented; then
+#       ensure_all_documented
+#     else
+#       echo "No ensure_all_documented function found, skipping documentation check"
+#     fi
+#
+#     if has ensure_all_set; then
+#       ensure_all_set
+#     else
+#       echo "No ensure_all_set function found, skipping environment variable check"
+#     fi
 
 __direnv_print_error() (
   local RED="\e[1;31m"
