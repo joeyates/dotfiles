@@ -1,85 +1,85 @@
 {
   "comment": "Reference: https://github.com/VSCodeVim/Vim#vscodevim-settings",
-  "github.copilot.nextEditSuggestions.enabled": true,
+  "chat.agent.maxRequests": 100,
   "chat.tools.terminal.autoApprove": {
-    "bundle": true,
-    "sed": true,
-    "rg": true,
     "ag": true,
-    "uniq": true,
+    "bin/branches-without-coverage": true,
     "bin/line-coverage": true,
     "bin/lines-without-coverage": true,
-    "bin/branches-without-coverage": true,
     "bin/unit-test-path": true,
-    "rspec": true,
-    "rake": true,
+    "bundle": true,
     "npm create": true,
     "npx": true,
-    "pnpm": true
+    "pnpm": true,
+    "rake": true,
+    "rg": true,
+    "rspec": true,
+    "sed": true,
+    "uniq": true
   },
-  "editor.tabSize": 2,
+  "editor.autoClosingBrackets": "never",
+  "editor.autoClosingDelete": "never",
+  "editor.autoClosingQuotes": "never",
   "editor.formatOnSave": true,
   "editor.insertSpaces": true,
+  "editor.minimap.enabled": false,
+  "editor.tabSize": 2,
+  "editor.wordBasedSuggestions": "currentDocument",
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "git.openRepositoryInParentFolders": "never",
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "prettier.arrowParens": "avoid",
+  "prettier.bracketSpacing": false,
+  "prettier.jsxSingleQuote": true,
+  "prettier.semi": false,
+  "prettier.singleQuote": true,
+  "prettier.trailingComma": "none",
+  "redhat.telemetry.enabled": false,
+  "security.workspace.trust.untrustedFiles": "open",
+  "svelte.enable-ts-plugin": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
   "vim.cursorStylePerMode.insert": "line-thin",
   "vim.cursorStylePerMode.normal": "line-thin",
   "vim.cursorStylePerMode.replace": "line-thin",
   "vim.cursorStylePerMode.visual": "line-thin",
   "vim.cursorStylePerMode.visualblock": "line-thin",
   "vim.cursorStylePerMode.visualline": "line-thin",
-  "chat.agent.maxRequests": 100,
-  "explorer.confirmDragAndDrop": false,
-  "explorer.confirmDelete": false,
-  "security.workspace.trust.untrustedFiles": "open",
+  "vim.enableNeovim": true,
+  "vim.ignorecase": false,
+  "vim.joinspaces": false,
+  "vim.leader": " ",
   "vim.neovimConfigPath": "~/.config/nvim/init.lua",
   "vim.neovimPath": "/usr/bin/nvim",
   "vim.neovimUseConfigFile": true,
-  "vim.enableNeovim": true,
-  "svelte.enable-ts-plugin": true,
-  "workbench.startupEditor": "none",
-  "editor.autoClosingBrackets": "never",
-  "editor.autoClosingDelete": "never",
-  "editor.autoClosingQuotes": "never",
-  "editor.minimap.enabled": false,
-  "vim.normalModeKeyBindingsNonRecursive.comment": "Handle :W as :w",
   "vim.normalModeKeyBindingsNonRecursive": [
     {
-      "before": [":", "W"],
-      "after": [":", "w"]
+      "after": [":", "w"],
+      "before": [":", "W"]
     }
   ],
-  "git.openRepositoryInParentFolders": "never",
-  "redhat.telemetry.enabled": false,
-  "workbench.editor.enablePreview": false,
+  "vim.normalModeKeyBindingsNonRecursive.comment": "Handle :W as :w",
   "window.confirmSaveUntitledWorkspace": false,
+  "workbench.editor.enablePreview": false,
+  "workbench.startupEditor": "none",
+  "[elixir]": {
+    "editor.wordBasedSuggestions": "currentDocument"
+  },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "prettier.bracketSpacing": false,
-  "prettier.jsxSingleQuote": true,
-  "prettier.semi": false,
-  "prettier.singleQuote": true,
-  "prettier.trailingComma": "none",
-  "prettier.arrowParens": "avoid",
-  "[typescript]": {
+  "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "typescript.updateImportsOnFileMove.enabled": "always",
-  "editor.wordBasedSuggestions": "currentDocument",
-  "[elixir]": {
-    "editor.wordBasedSuggestions": "currentDocument"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "vim.ignorecase": false,
-  "vim.joinspaces": false,
-  "vim.leader": " ",
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
