@@ -1,5 +1,0 @@
-# Run project-local scripts (low precedence)
-
-export PATH=$PATH:./bin
-
-# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles

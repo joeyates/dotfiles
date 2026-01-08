@@ -1,6 +1,0 @@
-export JAVA_HOME=/usr/lib/jvm/default-java
-export ANDROID_SDK=$HOME/.android/sdk
-export PATH=$PATH:$HOME/.android/platform-tools
-export PATH=$PATH:$HOME/.android/emulator
-
-# dotfiles: https://gitlab.com/joeyates/jgy-dotfiles
