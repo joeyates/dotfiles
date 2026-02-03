@@ -1,0 +1,14 @@
+set -E
+
+export DOKKU_DATABASE_BACKUPS=/var/backups/dokku/databases
+
+dokku-list-backups() (
+  local dokku_host=${DOKKU_HOST:?Not set}
+  ssh root@$dokku_host ls -ltr $DOKKU_DATABASE_BACKUPS
+)
+
+function dokku-fetch-backup() (
+  local dokku_host=${DOKKU_HOST:?Not set}
+  local file=${1:?Please pass a filename parameter}
+  scp root@$dokku_host:$DOKKU_DATABASE_BACKUPS/$file .
+)
