@@ -1,0 +1,154 @@
+#!/usr/bin/env elixir
+
+Mix.install([
+  {:collectable_streamer, "~> 0.2.1"}
+])
+
+System.fetch_env!("DOKKU_HOST")
+app_domain = System.fetch_env!("APP_DOMAIN")
+domain_email = System.fetch_env!("DOMAIN_EMAIL")
+dokku_app = System.fetch_env!("DOKKU_APP")
+app_port = System.fetch_env!("APP_PORT")
+staging = Enum.any?(System.argv(), &(&1 == "--staging"))
+
+defmodule Dokku do
+  defp run(command, opts \\ []) do
+    stream_output = opts[:stream_output] || false
+
+    into =
+      if stream_output do
+        CollectableStreamer.new(fn line -> IO.write(line) end)
+      else
+        ""
+      end
+
+    System.shell("ssh -tt dokku@$DOKKU_HOST #{command} 2>&1", into: into)
+  end
+
+  def exists?(app) do
+    {_output, exit} = run("apps:exists #{app}")
+    exit == 0
+  end
+
+  def running?(app) do
+    {output, _exit} = run("ps:report #{app}")
+    [_match, is_running] = Regex.run(~r/Running:\s+(\w+)/, output)
+    is_running == "true"
+  end
+
+  def app_create(app) do
+    {output, exit} = run("apps:create #{app}")
+    if exit == 0 do
+      :ok
+    else
+      {:error, output, exit}
+    end
+  end
+
+  def config_set(app, key, value, opts \\ []) do
+    restart = opts[:restart]
+    do_resart = if restart, do: "", else: "--no-restart "
+    command = "config:set #{do_resart} #{app} #{key}=#{value}"
+    run(command)
+  end
+
+  def config_unset(app, key, opts \\ []) do
+    restart = opts[:restart]
+    do_resart = if restart, do: "", else: "--no-restart "
+    command = "config:unset #{do_resart} #{app} #{key}"
+    run(command)
+  end
+
+  def domains_set(app, domain) do
+    {output, exit} = run("domains:set #{app} #{domain}")
+    if exit == 0 do
+      :ok
+    else
+      {:error, output, exit}
+    end
+  end
+
+  def letsencrypt_set(app, key, value) do
+    {output, exit} = run("letsencrypt:set #{app} #{key} #{value}")
+    if exit == 0 do
+      :ok
+    else
+      {:error, output, exit}
+    end
+  end
+
+  def letsencrypt_unset(app, key) do
+    {output, exit} = run("letsencrypt:set #{app} #{key}")
+    if exit == 0 do
+      :ok
+    else
+      {:error, output, exit}
+    end
+  end
+
+  def letsencrypt_enable(app, opts \\ []) do
+    {output, exit} = run("letsencrypt:enable #{app}", opts)
+    if exit == 0 do
+      :ok
+    else
+      {:error, output, exit}
+    end
+  end
+
+  def ports_set_80(app, port) do
+    {output, exit} = run("ports:set #{app} http:80:#{port}")
+    if exit == 0 do
+      :ok
+    else
+      {:error, output, exit}
+    end
+  end
+end
+
+IO.write("Checking the Dokku app exists: ")
+exists = Dokku.exists?(dokku_app)
+if exists do
+  IO.puts("✅")
+else
+  IO.puts("❌")
+  IO.write("The dokku app '#{dokku_app}' does not exist, creating... ")
+  case Dokku.app_create(dokku_app) do
+    {:error, output, exit} ->
+      raise "Failed to create app, exit code #{exit}: #{output}"
+    _ ->
+      IO.puts("✅")
+  end
+end
+
+IO.write("Setting domain to #{inspect(app_domain)} ")
+:ok = Dokku.domains_set(dokku_app, app_domain)
+IO.puts("✅")
+
+IO.write("Setting HTTP port mapping to 80:#{app_port} ")
+:ok = Dokku.ports_set_80(dokku_app, app_port)
+IO.puts("✅")
+
+IO.write("Setting email for Let's Encrypt to #{inspect(domain_email)} ")
+:ok = Dokku.letsencrypt_set(dokku_app, "email", domain_email)
+IO.puts("✅")
+
+if staging do
+  IO.write("Setting Let's Encrypt server to staging ")
+  :ok = Dokku.letsencrypt_set(dokku_app, "server", "staging")
+else
+  IO.write("Ensuring the production Let's Encrypt server is used ")
+  :ok = Dokku.letsencrypt_unset(dokku_app, "server")
+end
+IO.puts("✅")
+
+type = if staging, do: "staging", else: "production"
+IO.puts("Attempting to obtain a #{type} certificate...")
+
+case Dokku.letsencrypt_enable(dokku_app, stream_output: true) do
+  {:error, output, exit} ->
+    raise "Failed to obtain certificate, exit code #{exit}: #{output}"
+  _ ->
+    nil
+end
+
+IO.puts("Obtained and installed Let's Encrypt certificate")
