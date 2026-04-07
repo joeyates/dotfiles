@@ -6,6 +6,10 @@ export PATH=~/bin:$PATH
 
 export PATH=$PATH:./node_modules/.bin
 
+# locally installed programs
+
+export PATH=$PATH:$HOME/.local/bin
+
 # yarn
 
 export PATH=$PATH:$HOME/.config/yarn/global/node_modules/.bin
@@ -13,3 +17,7 @@ export PATH=$PATH:$HOME/.config/yarn/global/node_modules/.bin
 # In Bundler-managed Ruby projects, give predence to bundler shimmed scripts
 
 export PATH=./bin/stubs:$PATH
+
+# Add project scripts to PATH
+
+export PATH=./bin:$PATH

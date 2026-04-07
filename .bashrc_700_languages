@@ -1,9 +1,16 @@
 # asdf
 
-export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
-. <(asdf completion bash)
+export PATH="$HOME/.asdf/shims:$PATH"
+. <($HOME/bin/asdf completion bash)
 
 # Erlang
 
 ## Enable shell history
 export ERL_AFLAGS="-kernel shell_history enabled"
+
+# pnpm
+export PNPM_HOME="/home/joe/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
