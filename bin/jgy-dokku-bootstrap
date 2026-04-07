@@ -4,16 +4,112 @@ Mix.install([
   {:collectable_streamer, "~> 0.2.1"}
 ])
 
-System.fetch_env!("DOKKU_HOST")
-app_domain = System.fetch_env!("APP_DOMAIN")
-domain_email = System.fetch_env!("DOMAIN_EMAIL")
-dokku_app = System.fetch_env!("DOKKU_APP")
-app_port = System.fetch_env!("APP_PORT")
-staging = Enum.any?(System.argv(), &(&1 == "--staging"))
+defmodule Dokku.App do
+  defstruct [:dokku_app, :dokku_host, verbose: false]
 
-defmodule Dokku do
-  defp run(command, opts \\ []) do
-    stream_output = opts[:stream_output] || false
+  def new(opts) do
+    struct!(__MODULE__, opts)
+  end
+
+  def exists?(%__MODULE__{} = app) do
+    case Dokku.Run.app_command(app, "apps:exists #{app.dokku_app}") do
+      {:ok, _output} -> true
+      {:error, _output, 20} -> false
+      {:error, output, exit} -> raise "Error checking if app exists, exit code #{exit}: #{output}"
+    end
+  end
+
+  def running?(%__MODULE__{} = app) do
+    with {:ok, output} <- Dokku.Run.app_command(app, "ps:report #{app.dokku_app}"),
+         [status] <- Regex.run(~r/Running:\s+(\w+)/, output, capture: :all_but_first) do
+      status == "true"
+    else
+      {:error, output, exit} ->
+        raise "Error checking if app is running, exit code #{exit}: #{output}"
+    end
+  end
+
+  def create(%__MODULE__{} = app) do
+    case Dokku.Run.app_command(app, "apps:create #{app.dokku_app}") do
+       {:ok, _output} -> :ok
+       {:error, output, exit} -> {:error, output, exit}
+    end
+  end
+
+  def config_set(%__MODULE__{} = app, key, value, opts \\ []) do
+    restart = opts[:restart]
+    do_resart = if restart, do: "", else: "--no-restart "
+    command = "config:set #{do_resart} #{app.dokku_app} #{key}=#{value}"
+
+    case Dokku.Run.app_command(app, command) do
+      {:ok, _output} -> :ok
+      {:error, output, exit} -> {:error, output, exit}
+    end
+  end
+
+  def config_unset(%__MODULE__{} = app, key, opts \\ []) do
+    restart = opts[:restart]
+    do_resart = if restart, do: "", else: "--no-restart "
+    command = "config:unset #{do_resart} #{app.dokku_app} #{key}"
+    case Dokku.Run.app_command(app, command) do
+      {:ok, _output} -> :ok
+      {:error, output, exit} -> {:error, output, exit}
+    end
+  end
+
+  def domains_get(%__MODULE__{} = app) do
+    with {:ok, output} <- Dokku.Run.app_command(app, "domains:report #{app.dokku_app}"),
+         true <- String.match?(output, ~r/Domains app enabled:\s+true/),
+         [domain] <- Regex.run(~r<Domains app vhosts:\s+(.*)>, output, capture: :all_but_first) do
+      {:ok, domain}
+    else
+      {:error, output, exit} ->
+        {:error, output, exit}
+
+      _any ->
+        {:ok, nil}
+    end
+  end
+
+  def domains_set(%__MODULE__{} = app, domain) do
+    case Dokku.Run.app_command(app, "domains:set #{app.dokku_app} #{domain}") do
+       {:ok, _output} -> :ok
+       {:error, output, exit} -> {:error, output, exit}
+    end
+  end
+
+  def letsencrypt_set(%__MODULE__{} = app, key, value) do
+    case Dokku.Run.app_command(app, "letsencrypt:set #{app.dokku_app} #{key} #{value}") do
+       {:ok, _output} -> :ok
+       {:error, output, exit} -> {:error, output, exit}
+    end
+  end
+
+  def letsencrypt_unset(%__MODULE__{} = app, key) do
+    case Dokku.Run.app_command(app, "letsencrypt:set #{app.dokku_app} #{key}") do
+       {:ok, _output} -> :ok
+       {:error, output, exit} -> {:error, output, exit}
+    end
+  end
+
+  def letsencrypt_enable(%__MODULE__{} = app) do
+    case Dokku.Run.app_command(app, "letsencrypt:enable #{app.dokku_app}") do
+       {:ok, _output} -> :ok
+       {:error, output, exit} -> {:error, output, exit}
+    end
+  end
+
+  def ports_set_80(%__MODULE__{} = app, port) do
+    case Dokku.Run.app_command(app, "ports:set #{app.dokku_app} http:80:#{port}") do
+       {:ok, _output} -> :ok
+       {:error, output, exit} -> {:error, output, exit}
+    end
+  end
+end
+
+defmodule Dokku.Run do
+  def app_command(%Dokku.App{} = app, command) do
+    stream_output = app.verbose
 
     into =
       if stream_output do
@@ -22,133 +118,152 @@ defmodule Dokku do
         ""
       end
 
-    System.shell("ssh -tt dokku@$DOKKU_HOST #{command} 2>&1", into: into)
-  end
+    full_command = "ssh -tt dokku@#{app.dokku_host} #{command} 2>&1"
 
-  def exists?(app) do
-    {_output, exit} = run("apps:exists #{app}")
-    exit == 0
-  end
-
-  def running?(app) do
-    {output, _exit} = run("ps:report #{app}")
-    [_match, is_running] = Regex.run(~r/Running:\s+(\w+)/, output)
-    is_running == "true"
-  end
-
-  def app_create(app) do
-    {output, exit} = run("apps:create #{app}")
-    if exit == 0 do
-      :ok
-    else
-      {:error, output, exit}
+    if app.verbose do
+      IO.puts("Running command: #{full_command}")
     end
-  end
 
-  def config_set(app, key, value, opts \\ []) do
-    restart = opts[:restart]
-    do_resart = if restart, do: "", else: "--no-restart "
-    command = "config:set #{do_resart} #{app} #{key}=#{value}"
-    run(command)
-  end
+    case System.shell(full_command, into: into) do
+      {output, 0} ->
+        {:ok, output}
 
-  def config_unset(app, key, opts \\ []) do
-    restart = opts[:restart]
-    do_resart = if restart, do: "", else: "--no-restart "
-    command = "config:unset #{do_resart} #{app} #{key}"
-    run(command)
-  end
-
-  def domains_set(app, domain) do
-    {output, exit} = run("domains:set #{app} #{domain}")
-    if exit == 0 do
-      :ok
-    else
-      {:error, output, exit}
-    end
-  end
-
-  def letsencrypt_set(app, key, value) do
-    {output, exit} = run("letsencrypt:set #{app} #{key} #{value}")
-    if exit == 0 do
-      :ok
-    else
-      {:error, output, exit}
-    end
-  end
-
-  def letsencrypt_unset(app, key) do
-    {output, exit} = run("letsencrypt:set #{app} #{key}")
-    if exit == 0 do
-      :ok
-    else
-      {:error, output, exit}
-    end
-  end
-
-  def letsencrypt_enable(app, opts \\ []) do
-    {output, exit} = run("letsencrypt:enable #{app}", opts)
-    if exit == 0 do
-      :ok
-    else
-      {:error, output, exit}
-    end
-  end
-
-  def ports_set_80(app, port) do
-    {output, exit} = run("ports:set #{app} http:80:#{port}")
-    if exit == 0 do
-      :ok
-    else
-      {:error, output, exit}
+      {output, exit} ->
+        {:error, output, exit}
     end
   end
 end
 
-IO.write("Checking the Dokku app exists: ")
-exists = Dokku.exists?(dokku_app)
-if exists do
-  IO.puts("✅")
-else
-  IO.puts("❌")
-  IO.write("The dokku app '#{dokku_app}' does not exist, creating... ")
-  case Dokku.app_create(dokku_app) do
-    {:error, output, exit} ->
-      raise "Failed to create app, exit code #{exit}: #{output}"
-    _ ->
-      IO.puts("✅")
+defmodule Dokku.Bootstrap do
+  @enforce_keys [:app_domain, :app_port, :dokku_app, :dokku_host, :domain_email]
+  defstruct [
+    :app_domain, :app_port, :dokku_app, :dokku_host, :domain_email, staging: false, verbose: false
+  ]
+
+  def new(opts) do
+    struct!(__MODULE__, opts)
+  end
+
+  def run(%__MODULE__{} = config) do
+    :ok = ensure_app_exists(config)
+    :ok = ensure_domain_set(config)
+    :ok = enable_letsencrypt(config)
+  end
+
+  defp ensure_app_exists(%__MODULE__{} = config) do
+    app = app(config)
+
+    IO.puts("Checking the Dokku app #{inspect(app.dokku_app)} exists...")
+    exists = Dokku.App.exists?(app)
+
+    if exists do
+      IO.puts("\t✅ App exists")
+    else
+      IO.puts("The Dokku app #{inspect(app.dokku_app)} does not exist, creating...")
+      case Dokku.App.create(app) do
+        :ok ->
+          IO.puts("\t✅ App created")
+        {:error, output, exit} ->
+          raise "Failed to create app, exit code #{exit}: #{output}"
+      end
+    end
+
+    :ok
+  end
+
+  defp ensure_domain_set(%__MODULE__{} = config) do
+    app = app(config)
+    desired_domain = config.app_domain
+    IO.puts("Checking the app's domain is set to #{inspect(desired_domain)}...")
+    {:ok, current_domain} = Dokku.App.domains_get(app)
+
+    cond do
+      current_domain == desired_domain ->
+        IO.puts("\t✅ Domain is already set correctly")
+
+      is_nil(current_domain) ->
+        IO.puts("No domain currently set")
+        IO.puts("Setting domain to #{inspect(desired_domain)}...")
+        :ok = Dokku.App.domains_set(app, desired_domain)
+        IO.puts("\t✅ Domain set to #{inspect(desired_domain)}")
+
+      true ->
+        raise "App already has a domain set to #{inspect(current_domain)}, " <>
+          "expected #{inspect(config.app_domain)}."
+    end
+
+    :ok
+  end
+
+  defp ensure_port_mapping(%__MODULE__{} = config) do
+    app = app(config)
+    desired_port = config.app_port
+    IO.puts("Setting HTTP port mapping to 80:#{desired_port}...")
+    :ok = Dokku.App.ports_set_80(app, desired_port)
+    IO.puts("\t✅ Port mapping set")
+    :ok
+  end
+
+  defp enable_letsencrypt(%__MODULE__{} = config) do
+    :ok = ensure_port_mapping(config)
+
+    %{domain_email: email, staging: staging} = config
+    app = app(config)
+
+    IO.puts("Setting email for Let's Encrypt to #{inspect(email)}...")
+    :ok = Dokku.App.letsencrypt_set(app, "email", email)
+    IO.puts("\t✅ Email set to #{inspect(email)}")
+
+    if staging do
+      IO.puts("Setting Let's Encrypt server to staging...")
+      :ok = Dokku.App.letsencrypt_set(app, "server", "staging")
+      IO.puts("\t✅ Let's Encrypt staging server set")
+    else
+      IO.puts("Ensuring the production Let's Encrypt server is used...")
+      :ok = Dokku.App.letsencrypt_unset(app, "server")
+      IO.puts("\t✅ Let's Encrypt production server set")
+    end
+
+    type = if staging, do: "staging", else: "production"
+    IO.puts("Attempting to obtain a #{type} certificate...")
+
+    case Dokku.App.letsencrypt_enable(app) do
+      {:error, output, exit} ->
+        raise "Failed to obtain certificate, exit code #{exit}: #{output}"
+      _ ->
+        nil
+    end
+
+    IO.puts("\t✅ Obtained and installed Let's Encrypt certificate")
+
+    :ok
+  end
+
+  defp app(%__MODULE__{} = config) do
+    %Dokku.App{
+      dokku_app: config.dokku_app,
+      dokku_host: config.dokku_host,
+      verbose: config.verbose
+    }
   end
 end
 
-IO.write("Setting domain to #{inspect(app_domain)} ")
-:ok = Dokku.domains_set(dokku_app, app_domain)
-IO.puts("✅")
+dokku_host = System.fetch_env!("DOKKU_HOST")
+app_domain = System.fetch_env!("APP_DOMAIN")
+domain_email = System.fetch_env!("DOMAIN_EMAIL")
+dokku_app = System.fetch_env!("DOKKU_APP")
+app_port = System.fetch_env!("APP_PORT")
+staging = Enum.any?(System.argv(), &(&1 == "--staging"))
+verbose = Enum.any?(System.argv(), &(&1 == "--verbose"))
 
-IO.write("Setting HTTP port mapping to 80:#{app_port} ")
-:ok = Dokku.ports_set_80(dokku_app, app_port)
-IO.puts("✅")
+config = Dokku.Bootstrap.new(%{
+  app_domain: app_domain,
+  app_port: app_port,
+  dokku_app: dokku_app,
+  dokku_host: dokku_host,
+  domain_email: domain_email,
+  staging: staging,
+  verbose: verbose
+})
 
-IO.write("Setting email for Let's Encrypt to #{inspect(domain_email)} ")
-:ok = Dokku.letsencrypt_set(dokku_app, "email", domain_email)
-IO.puts("✅")
-
-if staging do
-  IO.write("Setting Let's Encrypt server to staging ")
-  :ok = Dokku.letsencrypt_set(dokku_app, "server", "staging")
-else
-  IO.write("Ensuring the production Let's Encrypt server is used ")
-  :ok = Dokku.letsencrypt_unset(dokku_app, "server")
-end
-IO.puts("✅")
-
-type = if staging, do: "staging", else: "production"
-IO.puts("Attempting to obtain a #{type} certificate...")
-
-case Dokku.letsencrypt_enable(dokku_app, stream_output: true) do
-  {:error, output, exit} ->
-    raise "Failed to obtain certificate, exit code #{exit}: #{output}"
-  _ ->
-    nil
-end
-
-IO.puts("Obtained and installed Let's Encrypt certificate")
+Dokku.Bootstrap.run(config)
