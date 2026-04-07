@@ -2,42 +2,77 @@
   "comment": "Reference: https://github.com/VSCodeVim/Vim#vscodevim-settings",
   "chat.agent.maxRequests": 100,
   "chat.tools.terminal.autoApprove": {
-    "ag": true,
-    "bin/branches-without-coverage": true,
-    "bin/line-coverage": true,
-    "bin/lines-without-coverage": true,
+    "curl": false,
+    "dd": false,
+    "eval": false,
+    "kill": false,
+    "rm": false,
+    "rmdir": false,
+    "wget": false,
+    "xargs": false,
     "bin/unit-test-path": true,
-    "bundle": true,
-    "npm create": true,
-    "npx": true,
-    "pnpm": true,
-    "rake": true,
+    "ag": true,
+    "asdf": true,
+    "basename": true,
+    "cat": true,
+    "cd": true,
+    "chmod": true,
+    "chown": true,
+    "cmp": true,
+    "cut": true,
+    "df": true,
+    "dirname": true,
+    "du": true,
+    "echo": true,
+    "elixir": true,
+    "file": true,
+    "git": true,
+    "grep": true,
+    "head": true,
+    "jq": true,
+    "ls": true,
+    "nl": true,
+    "od": true,
+    "printf": true,
+    "ps": true,
+    "pwd": true,
+    "readlink": true,
+    "realpath": true,
     "rg": true,
-    "rspec": true,
     "sed": true,
-    "uniq": true
+    "sleep": true,
+    "sort": true,
+    "stat": true,
+    "tail": true,
+    "top": true,
+    "tr": true,
+    "tree": true,
+    "uniq": true,
+    "which": true,
+    "xxd": true,
+    "mix": true,
+    "MIX_ENV=prod mix": true,
+    "/dev/null": true,
+    "2>/dev/null": true,
+    "bundle": true
   },
   "editor.autoClosingBrackets": "never",
   "editor.autoClosingDelete": "never",
   "editor.autoClosingQuotes": "never",
-  "editor.formatOnSave": true,
   "editor.insertSpaces": true,
   "editor.minimap.enabled": false,
   "editor.tabSize": 2,
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave.comment": "Format with default formatter on save",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
   "editor.wordBasedSuggestions": "currentDocument",
   "explorer.confirmDelete": false,
   "explorer.confirmDragAndDrop": false,
   "git.openRepositoryInParentFolders": "never",
   "github.copilot.nextEditSuggestions.enabled": true,
-  "prettier.arrowParens": "avoid",
-  "prettier.bracketSpacing": false,
-  "prettier.jsxSingleQuote": true,
-  "prettier.semi": false,
-  "prettier.singleQuote": true,
-  "prettier.trailingComma": "none",
-  "redhat.telemetry.enabled": false,
   "security.workspace.trust.untrustedFiles": "open",
-  "svelte.enable-ts-plugin": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
   "vim.cursorStylePerMode.insert": "line-thin",
   "vim.cursorStylePerMode.normal": "line-thin",
@@ -52,35 +87,59 @@
   "vim.neovimConfigPath": "~/.config/nvim/init.lua",
   "vim.neovimPath": "/usr/bin/nvim",
   "vim.neovimUseConfigFile": true,
+  "vim.normalModeKeyBindingsNonRecursive.comment": "Handle :W as :w",
   "vim.normalModeKeyBindingsNonRecursive": [
     {
       "after": [":", "w"],
       "before": [":", "W"]
     }
   ],
-  "vim.normalModeKeyBindingsNonRecursive.comment": "Handle :W as :w",
   "window.confirmSaveUntitledWorkspace": false,
   "workbench.editor.enablePreview": false,
   "workbench.startupEditor": "none",
   "[elixir]": {
-    "editor.wordBasedSuggestions": "currentDocument"
+    "editor.wordBasedSuggestions": "currentDocument",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "JakeBecker.elixir-ls"
   },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "extensions.ignoreRecommendations": true,
+  "update.showReleaseNotes": false,
+  "chat.instructionsFilesLocations": {
+    "AGENTS.md": true,
+    ".github/instructions": false
   },
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "chat.checkpoints.enabled": false,
+  "chat.viewWelcome.enabled": false,
+  "chat.viewTitle.enabled": false,
+  "inlineChat.holdToSpeech": false,
+  "chat.viewSessions.orientation": "stacked",
+  "search.exclude": {
+    "_build/**": true,
+    ".claude/**": true,
+    ".elixir_ls/**": true,
+    "**/*.code-search": false,
+    "**/bower_components": false,
+    "cover/**": true,
+    "deps/**": true,
+    "jgy-*": true,
+    "priv/static/**": true
   },
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "files.exclude": {
+    "**/.DS_Store": false,
+    "**/.hg": false,
+    "**/.svn": false,
+    "**/CVS": false,
+    "**/Thumbs.db": false
   },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "chat.tools.edits.autoApprove": {
+    "**/*": true
   },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[yaml]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "github.copilot.chat.codeGeneration.useInstructionFiles": false,
+  "terminal.integrated.enableMultiLinePasteWarning": "never",
+  "editor.snippetSuggestions": "top",
+  "editor.tabCompletion": "onlySnippets",
+  "editor.suggest.snippetsPreventQuickSuggestions": true,
+  "chat.editing.autoAcceptDelay": 1,
+  "editor.dropIntoEditor.preferences": [
+  ],
 }
