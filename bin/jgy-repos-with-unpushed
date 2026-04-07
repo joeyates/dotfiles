@@ -6,6 +6,9 @@
 # This script assumes that repos are checked out as USERNAME/REPO,
 # i.e. torvalds/linux
 
+# It should be run from the parent directory of these USERNAME/REPO directories.
+
+
 require "fileutils"
 require "optparse"
 

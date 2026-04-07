@@ -1,5 +1,9 @@
 #!/usr/bin/env elixir
 
+# Upload media files to a remote server, skipping files that are already present.
+# Files must have a filename that indicates their creation date.
+# Files are uploaded to a directory structure that mirrors the date structure in the filenames.
+
 {options, _rest} = OptionParser.parse!(
   System.argv(),
   strict: [host: :string, path: :string, source: :string]
