@@ -1,3 +1,7 @@
+[core]
+  # https://git-scm.com/docs/git-config#Documentation/git-config.txt-corepager
+  # ...requires installation of delta
+  #pager = delta
 [init]
   # https://git-scm.com/docs/git-init#Documentation/git-init.txt-initdefaultBranch
   defaultBranch = main
@@ -46,7 +50,7 @@
   # https://git-scm.com/docs/git-config#Documentation/git-config.txt-skippedCherryPicks
   skippedCherryPicks = false
 [unmanaged]
-  useful = "(^data_bag_key$|(^|\\/)\\.envrc.private$|(^|\\/)jgy-|^key_for_data_bags?$)"
+  useful = "(^data_bag_key$|(^|\\/)\\.envrc.private|(^|\\/)jgy-|^key_for_data_bags?$)"
 [help]
   autocorrect = 1
 # For color.* settings see 'Variables' in git help config
@@ -135,13 +139,14 @@
   an                  = add --intent-to-add .
 
   ##########################
-  # committing
+  # commits
 
   cm                  = commit
   cmm                 = commit -m
   ca                  = commit --amend --no-edit
   cae                 = commit --amend
   initial             = commit --allow-empty -m 'Initial commit'
+  anonymise           = commit --amend --reset-author --no-edit
 
   #########################
   # status

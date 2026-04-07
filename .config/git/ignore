@@ -8,7 +8,6 @@ cover/
 coverage/
 deps/
 .elixir_ls/
-.envrc
 .envrc.*
 erl_crash.dump
 *.ez
@@ -21,3 +20,5 @@ priv/static/assets/
 .session.nvim
 .vscode/
 yarn-error.log
+
+**/.claude/settings.local.json
