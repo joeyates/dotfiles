@@ -153,12 +153,13 @@ function jgy-ssh-keygen() {
   BYTES=${BYTES:-4096}
   COMMENT=${COMMENT:-RSA key}
   NAME=${NAME:-id_rsa}
-  ALGORITHM=${ALGORITHM:-ed25519}
-  ssh-keygen -t $ALGORITHM -b $BYTES -N "" -C "$COMMENT" -f "$NAME"
+  ROUNDS=${ROUNDS:-100}
+  TYPE=${TYPE:-ed25519}
+  ssh-keygen -b "$BYTES" -C "$COMMENT" -f "$NAME" -N "" -a "$ROUNDS" -t "$TYPE"
 }
 
 function jgy-ssh-keygen-usage() {
-  echo "Usage: [BYTES=2048|4096*] [COMMENT=""] [NAME=FILE_NAME] [ALGORITHM=ed25519*|rsa] jgy-ssh-keygen";
+  echo "Usage: [BYTES=2048|4096*] [COMMENT=""] [NAME=FILE_NAME] [ROUNDS=100*|NUMBER] [TYPE=ed25519*|rsa] jgy-ssh-keygen";
 }
 
 ##########################################
