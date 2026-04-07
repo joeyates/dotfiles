@@ -166,6 +166,10 @@ function jgy-ssh-keygen-usage() {
 # editor
 
 function jgy-edit {
+  code -r "$@"
+}
+
+function jgy-neovim {
   # pip3 install neovim-remote
   nvr -s "$@"
 }
