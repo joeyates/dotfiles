@@ -118,7 +118,7 @@ defmodule Dokku.Run do
         ""
       end
 
-    full_command = "ssh -tt dokku@#{app.dokku_host} #{command} 2>&1"
+    full_command = "ssh dokku@#{app.dokku_host} #{command} 2>&1"
 
     if app.verbose do
       IO.puts("Running command: #{full_command}")
