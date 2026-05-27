@@ -3,9 +3,9 @@ name: Planning
 description: 'Aids creation of development plans based on TODO items.'
 tools: [execute/testFailure, execute/getTerminalOutput, execute/awaitTerminal, execute/killTerminal, execute/createAndRunTask, execute/runInTerminal, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web/fetch, todo]
 handoffs:
-  - label: Propose a development plan
-    agent: agent
-    prompt: Propose a development plan for the first TODO item with status [ ] in `docs/TODO.md`
+  - label: Approved
+    agent: Planning
+    prompt: The plan has been approved. Create the plan file and mark the TODO item as done.
     send: true
   - label: Start implementation
     agent: Implementation
@@ -49,9 +49,9 @@ Provide a concise overview of the feature or task.
 ## Tasks
 
 Break down the objectives into specific, actionable tasks.
-Testing will be handled by the implementation agent, it is not necessary to include testing tasks in the plan.
-Each objective should be a bullet point with an empty checkbox to indicate task completion status, like so:
-- [ ] Task 1
+Each objective should be a numbered bullet point with an empty checkbox to indicate task completion status, like so:
+- [ ] 1. Task one description.
+The implementation agent will use TDD, so it is not necessary to include separate testing tasks in the plan. Changes to implementation should be accompanied by tests as part of the same task.
 
 Always add two final tasks:
 - [ ] Ask the user for feedback on the state of the implementation and carry out any requested corrections.
@@ -77,3 +77,7 @@ When given a TODO item title, you should:
    - **Approve**: Create the plan file in `docs/plans/` using the next successive number and mark the item as done in `docs/TODO.md`.
 5. Finally, create a commit with message "Transform TODO into plan"
 </workflow>
+
+<guidelines>
+- Plans should organize around a red/green TDD approach
+</guidelines>

@@ -2,11 +2,15 @@
 name: Implementation
 description: 'Implements development plans.'
 tools:
-  ['execute/testFailure', 'execute/getTerminalOutput', 'execute/createAndRunTask', 'execute/runInTerminal', 'read/readFile', 'edit/createFile', 'edit/editFiles', 'search', 'web/fetch', 'agent', 'todo']
+  [vscode/memory, vscode/runCommand, execute/testFailure, execute/getTerminalOutput, execute/createAndRunTask, execute/runInTerminal, read/readFile, agent/runSubagent, edit/createDirectory, edit/createFile, edit/editFiles, edit/rename, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/usages, web/fetch, jakebecker.elixir-ls/elixir-definition, jakebecker.elixir-ls/elixir-environment, jakebecker.elixir-ls/elixir-module-dependencies, jakebecker.elixir-ls/elixir-docs, jakebecker.elixir-ls/elixir-implementation-finder, jakebecker.elixir-ls/elixir-types, todo]
 handoffs: 
   - label: Start Next Task
     agent: agent
     prompt: Implement the next task in the plan
+    send: true
+  - label: Mark Plan Complete
+    agent: agent
+    prompt: Mark the plan as complete by renaming the file to include _done and merging the branch into main
     send: true
 ---
 
@@ -52,7 +56,8 @@ Each plan contains a `## Tasks` section with checkboxes:
   - if the task title is too long, shorten it but keep the meaning
   - never use `git add -A` or `git add .` - only stage the specific files that were changed for the task
 - If a task is unclear or blocked, ask the user for clarification
-- If a task involves deleting files, avoid using `rm`, instead move files to `/tmp/PROJECT_NAME`
+- When renaming files, don't just create the new file and delete the old one, use `git mv` to avoid unintended changes
+- If a task involves deleting untracked files, avoid using `rm`, instead move files to `/tmp/PROJECT_NAME`
 - Ignore all files with a `jgy-` prefix in the filename, they are notes and already globally Git-ignored
 </guidelines>
 
@@ -61,3 +66,4 @@ Each plan contains a `## Tasks` section with checkboxes:
 - If a task involves fixing a bug, first write a test that reproduces the bug, see it fail, then implement the fix to make the test pass
 - Do not test private functions
 - Do not use the methods of the module under test has helpers in tests
+</testing>

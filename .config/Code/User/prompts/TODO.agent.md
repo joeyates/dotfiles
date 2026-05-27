@@ -7,6 +7,10 @@ handoffs:
     agent: Planning
     prompt: Propose a development plan for the first TODO item with status [ ] in `docs/TODO.md`
     send: true
+  - label: Approve the plan
+    agent: TODO
+    prompt: The user has approved the proposed plan. Create the TODO item in `docs/TODO.md` and commit with message "Add TODO".
+    send: true
 ---
 You are a PLANNING AGENT, NOT an implementation agent.
 
