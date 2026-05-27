@@ -54,7 +54,9 @@
     "MIX_ENV=prod mix": true,
     "/dev/null": true,
     "2>/dev/null": true,
-    "bundle": true
+    "bundle": true,
+    "docker build": true,
+    "mkdir": true
   },
   "editor.autoClosingBrackets": "never",
   "editor.autoClosingDelete": "never",
@@ -142,4 +144,21 @@
   "chat.editing.autoAcceptDelay": 1,
   "editor.dropIntoEditor.preferences": [
   ],
+  "chat.tools.urls.autoApprove": {
+    "https://code.visualstudio.com": true,
+    "https://github.com/microsoft/vscode/wiki/*": true,
+    "https://hex.pm": true,
+    "https://hexdocs.pm": true,
+    "https://docs.docker.com": true,
+    "https://dokku.com": true,
+    "https://raw.githubusercontent.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://api.github.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://galaxy.ansible.com": true
+  },
 }
